@@ -69,6 +69,14 @@ development:
     npx supabase start
     npx supabase db reset
 
+`db reset` creates one confirmed local test account:
+
+    Email: tester@owntheperk.local
+    Password: TestPassword123!
+
+The account is for local development only and already has the onboarded pseudonymous
+profile `PerkTester`. Never create these credentials in a hosted environment.
+
 For a linked hosted project, review the target and then apply migrations with:
 
     npx supabase link --project-ref YOUR_PROJECT_REF
