@@ -1,69 +1,54 @@
-import { ArrowLeft, FileLock2, ListPlus } from "lucide-react";
+import { ArrowLeft, CreditCard, FileLock2 } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/ui/button";
+import { createOfferAction } from "@/features/offers/actions";
+import { OfferForm } from "@/features/offers/components/offer-form";
+import { getOfferFormOptions } from "@/features/offers/data";
+import { createClient } from "@/lib/supabase/server";
 
-const plannedSteps = [
-  "Select a private card profile",
-  "Choose a merchant",
-  "Enter offer terms",
-  "Upload private evidence",
-  "Submit for verification",
-];
+export const metadata: Metadata = { title: "Add offer" };
 
-export default function NewOfferPage() {
+export default async function NewOfferPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const { cards, merchants } = await getOfferFormOptions(supabase, user.id);
+
   return (
     <div className="space-y-8">
-      <Link
-        href="/offers"
-        className="inline-flex min-h-10 items-center gap-2 rounded-lg text-sm font-semibold text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <ArrowLeft aria-hidden="true" className="size-4" />
-        My offers
+      <Link href="/offers" className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+        <ArrowLeft aria-hidden="true" className="size-4" /> My offers
       </Link>
-
       <PageHeader
-        eyebrow="Listing workflow preview"
+        eyebrow="Private listing setup"
         title="Add an offer"
-        description="The secure card, evidence upload, and submission flow will be implemented after the database and RLS foundation."
+        description="Save a draft at any time. Submission requires private evidence and always enters pending verification."
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
-          <div className="flex items-center gap-3">
-            <span className="grid size-11 place-items-center rounded-2xl bg-secondary text-primary">
-              <ListPlus aria-hidden="true" className="size-5" />
-            </span>
-            <div>
-              <h2 className="font-semibold">Planned listing steps</h2>
-              <p className="text-xs text-muted-foreground">No data is submitted on this screen.</p>
-            </div>
-          </div>
-          <ol className="mt-7 space-y-3">
-            {plannedSteps.map((step, index) => (
-              <li key={step} className="flex min-h-14 items-center gap-3 rounded-2xl bg-muted/75 px-4">
-                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-card text-xs font-bold text-primary shadow-sm">
-                  {index + 1}
-                </span>
-                <span className="text-sm font-medium">{step}</span>
-              </li>
-            ))}
-          </ol>
+      {!cards.length ? (
+        <section className="rounded-3xl border border-border bg-card p-6 text-center sm:p-8">
+          <CreditCard aria-hidden="true" className="mx-auto size-8 text-primary" />
+          <h2 className="mt-4 text-lg font-semibold">Add an active card first</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">Offers must belong to one of your private card profiles.</p>
+          <Link href="/offers/cards" className={buttonVariants({ className: "mt-5" })}>Manage private cards</Link>
         </section>
-
-        <aside className="h-fit rounded-3xl bg-brand-ink p-6 text-primary-foreground">
-          <FileLock2 aria-hidden="true" className="size-6 text-[#a8d8cb]" />
-          <h2 className="mt-5 text-lg font-semibold">Evidence stays private</h2>
-          <p className="mt-2 text-sm leading-6 text-white/75">
-            Future uploads will use private Supabase Storage and short-lived signed URLs,
-            accessible only to the owner and authorized reviewers.
-          </p>
-          <span className={buttonVariants({ variant: "secondary", className: "mt-6 w-full opacity-70" })}>
-            Available in a later phase
-          </span>
-        </aside>
-      </div>
+      ) : (
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
+            <OfferForm action={createOfferAction} cards={cards} merchants={merchants} />
+          </section>
+          <aside className="h-fit rounded-3xl bg-brand-ink p-6 text-primary-foreground">
+            <FileLock2 aria-hidden="true" className="size-6 text-[#a8d8cb]" />
+            <h2 className="mt-5 text-lg font-semibold">Evidence stays private</h2>
+            <p className="mt-2 text-sm leading-6 text-white/75">Files use opaque storage paths in a non-public bucket. Other marketplace users cannot access them.</p>
+            <p className="mt-5 text-xs leading-5 text-white/60">Never upload full card numbers, CVV, PIN, passwords, or issuer login screens containing credentials.</p>
+          </aside>
+        </div>
+      )}
     </div>
   );
 }
