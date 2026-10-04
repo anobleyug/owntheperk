@@ -4,9 +4,10 @@ A mobile-first, pseudonymous discovery marketplace for verified merchant-specifi
 card offers. The platform helps people discover offers, evaluate reputation, and
 connect privately; it does not sell, transfer, broker, settle, or guarantee offers.
 
-This repository currently contains the Phase 1 application foundation and UI shell
-only. Authentication flows, database tables, offer verification, checkout, webhooks,
-and messaging are intentionally not implemented.
+This repository contains the Phase 1 application foundation plus the Phase 2
+Supabase Auth, pseudonymous profile, and Row Level Security foundation. Offers,
+verification evidence, checkout, messaging, ratings, and moderation are intentionally
+not implemented yet.
 
 ## Stack
 
@@ -52,7 +53,56 @@ and the publishable key so Row Level Security remains effective.
 
     npm run lint
     npm run typecheck
+    npm test
+    npm run test:db
     npm run build
+
+The database test requires Docker and a running local Supabase stack (`npx supabase
+start`). It verifies profile grants, RLS isolation, protected trust fields, the safe
+public view, and database-enforced username rules.
+
+## Supabase setup
+
+Database changes are reproducible migrations in `supabase/migrations`. For local
+development:
+
+    npx supabase start
+    npx supabase db reset
+
+For a linked hosted project, review the target and then apply migrations with:
+
+    npx supabase link --project-ref YOUR_PROJECT_REF
+    npx supabase db push
+
+In the hosted Supabase dashboard, configure the following Auth settings:
+
+1. Set the Site URL to the production `NEXT_PUBLIC_APP_URL`.
+2. Add exact redirect URLs for `/auth/callback` on production and each approved local
+   or preview origin. Do not use a broad wildcard in production.
+3. Keep email/password signup and email confirmation enabled.
+4. Configure production SMTP and use the confirmation and recovery templates from
+   `supabase/templates`. The CLI configuration already wires them for local Supabase.
+5. Keep leaked-password protection and suitable Auth rate limits enabled where the
+   Supabase plan supports them.
+
+Phone verification is deliberately not simulated. The schema reserves the trusted
+`phone_verified` field, which normal users cannot update. To add the real flow, choose
+and configure a supported SMS provider in Supabase Auth, enable phone confirmations,
+add the production SMS credentials as Supabase secrets, and implement OTP enrollment
+and verification before trusted server logic synchronizes verification state. Do not
+enable a UI badge based only on a client claim or form submission.
+
+## Phase 2 security boundary
+
+- Auth identity and email remain in `auth.users`; they are not copied into public
+  application tables.
+- `profiles` stores pseudonymous identity and protected reputation/trust state.
+- Authenticated clients receive column-level access only to safe profile fields.
+- `public_profiles` is the marketplace DTO view and omits risk/account metadata.
+- Users can update only their own username, avatar URL, bio, and one-way onboarding
+  flag. Database grants, RLS, and a trigger protect verification/reputation fields.
+- Route protection is enforced by the session-refresh proxy and rechecked in the
+  authenticated server layout.
 
 ## Railway
 

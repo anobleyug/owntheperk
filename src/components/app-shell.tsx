@@ -4,7 +4,19 @@ import type { ReactNode } from "react";
 import { DesktopNavigation, MobileNavigation } from "@/components/app-navigation";
 import { Brand } from "@/components/brand";
 
-export function AppShell({ children }: { children: ReactNode }) {
+function initialsFor(username: string) {
+  return username.slice(0, 2).toUpperCase();
+}
+
+export function AppShell({
+  children,
+  username,
+  avatarUrl,
+}: {
+  children: ReactNode;
+  username: string;
+  avatarUrl: string | null;
+}) {
   return (
     <div className="min-h-svh bg-background lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <aside className="sticky top-0 hidden h-svh border-r border-border bg-card/65 p-5 lg:flex lg:flex-col">
@@ -26,12 +38,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/70 bg-background/90 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <Brand compact href="/search" className="lg:hidden" />
           <div className="hidden lg:block">
-            <p className="text-xs font-semibold text-muted-foreground">Marketplace preview</p>
-            <p className="text-sm font-semibold">Welcome back, PerkFinder</p>
+            <p className="text-xs font-semibold text-muted-foreground">Marketplace</p>
+            <p className="text-sm font-semibold">Welcome back, {username}</p>
           </div>
           <div className="flex items-center gap-2">
             <span className="hidden rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-primary sm:inline-flex">
-              Foundation phase
+              Profile protected
             </span>
             <button
               type="button"
@@ -40,12 +52,22 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <Bell aria-hidden="true" className="size-4.5" />
             </button>
-            <span
-              aria-label="Profile placeholder for PerkFinder"
-              className="grid size-10 place-items-center rounded-full bg-brand-ink text-xs font-bold text-primary-foreground"
-            >
-              PF
-            </span>
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={avatarUrl}
+                alt={`${username}'s avatar`}
+                referrerPolicy="no-referrer"
+                className="size-10 rounded-full bg-muted object-cover"
+              />
+            ) : (
+              <span
+                aria-label={`${username}'s avatar`}
+                className="grid size-10 place-items-center rounded-full bg-brand-ink text-xs font-bold text-primary-foreground"
+              >
+                {initialsFor(username)}
+              </span>
+            )}
           </div>
         </header>
 

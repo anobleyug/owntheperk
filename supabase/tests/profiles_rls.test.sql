@@ -1,6 +1,6 @@
 begin;
 
-select plan(18);
+select plan(19);
 
 insert into auth.users (id, email)
 values
@@ -168,6 +168,17 @@ select throws_ok(
   '23514',
   null,
   'reserved usernames are rejected by the database'
+);
+
+select throws_ok(
+  $$
+    update public.profiles
+    set username = 'Deal555-123-4567'
+    where id = '11111111-1111-1111-1111-111111111111'
+  $$,
+  '23514',
+  null,
+  'phone-like usernames are rejected even when digits use separators'
 );
 
 select results_eq(

@@ -11,16 +11,16 @@ export function MarketingHeader() {
         <Brand />
         <nav aria-label="Marketing navigation" className="flex items-center gap-2">
           <Link
-            href="/search"
+            href="/login"
             className={buttonVariants({ variant: "ghost", size: "sm" })}
           >
-            App preview
+            Log in
           </Link>
           <Link
-            href="/search"
+            href="/signup"
             className={buttonVariants({ size: "sm", className: "hidden sm:inline-flex" })}
           >
-            Explore offers
+            Get started
             <ArrowRight aria-hidden="true" />
           </Link>
         </nav>
