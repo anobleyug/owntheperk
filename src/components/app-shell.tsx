@@ -1,0 +1,60 @@
+import { Bell, ShieldCheck } from "lucide-react";
+import type { ReactNode } from "react";
+
+import { DesktopNavigation, MobileNavigation } from "@/components/app-navigation";
+import { Brand } from "@/components/brand";
+
+export function AppShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-svh bg-background lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+      <aside className="sticky top-0 hidden h-svh border-r border-border bg-card/65 p-5 lg:flex lg:flex-col">
+        <Brand href="/search" />
+        <DesktopNavigation />
+
+        <div className="mt-auto rounded-2xl border border-border bg-background p-3.5">
+          <div className="flex items-center gap-2 text-xs font-semibold text-primary">
+            <ShieldCheck aria-hidden="true" className="size-4" />
+            Privacy by default
+          </div>
+          <p className="mt-2 text-xs leading-5 text-muted-foreground">
+            Public marketplace views never show card details or verification evidence.
+          </p>
+        </div>
+      </aside>
+
+      <div className="min-w-0">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/70 bg-background/90 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+          <Brand compact href="/search" className="lg:hidden" />
+          <div className="hidden lg:block">
+            <p className="text-xs font-semibold text-muted-foreground">Marketplace preview</p>
+            <p className="text-sm font-semibold">Welcome back, PerkFinder</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="hidden rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-primary sm:inline-flex">
+              Foundation phase
+            </span>
+            <button
+              type="button"
+              aria-label="Notifications"
+              className="grid size-10 place-items-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+              <Bell aria-hidden="true" className="size-4.5" />
+            </button>
+            <span
+              aria-label="Profile placeholder for PerkFinder"
+              className="grid size-10 place-items-center rounded-full bg-brand-ink text-xs font-bold text-primary-foreground"
+            >
+              PF
+            </span>
+          </div>
+        </header>
+
+        <main className="mx-auto w-full max-w-6xl px-4 pt-7 pb-28 sm:px-6 sm:pt-9 lg:px-10 lg:pb-12">
+          {children}
+        </main>
+      </div>
+
+      <MobileNavigation />
+    </div>
+  );
+}

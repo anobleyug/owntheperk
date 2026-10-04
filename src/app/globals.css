@@ -1,0 +1,91 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-mint: var(--brand-mint);
+  --color-brand-ink: var(--brand-ink);
+  --font-sans: var(--font-sans);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
+}
+
+:root {
+  --background: oklch(0.985 0.008 100);
+  --foreground: oklch(0.2 0.025 198);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.025 198);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.025 198);
+  --primary: oklch(0.36 0.085 186);
+  --primary-foreground: oklch(0.985 0.006 180);
+  --secondary: oklch(0.93 0.035 168);
+  --secondary-foreground: oklch(0.27 0.06 184);
+  --muted: oklch(0.955 0.012 100);
+  --muted-foreground: oklch(0.5 0.025 198);
+  --accent: oklch(0.89 0.075 83);
+  --accent-foreground: oklch(0.28 0.045 75);
+  --border: oklch(0.9 0.017 108);
+  --input: oklch(0.9 0.017 108);
+  --ring: oklch(0.55 0.09 181);
+  --brand-mint: oklch(0.88 0.075 168);
+  --brand-ink: oklch(0.23 0.055 193);
+  --radius: 0.875rem;
+  --font-sans: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth bg-background;
+  }
+
+  body {
+    @apply min-h-svh bg-background text-foreground antialiased;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+::selection {
+  background: color-mix(in oklab, var(--brand-mint) 80%, white);
+  color: var(--brand-ink);
+}
+
+.safe-bottom {
+  padding-bottom: max(0.55rem, env(safe-area-inset-bottom));
+}
+
+.paper-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--border) 45%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--border) 45%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
