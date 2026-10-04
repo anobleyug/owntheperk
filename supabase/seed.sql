@@ -1,0 +1,1 @@
+-- Intentionally empty. Phase 2 does not create production-like users or profiles.
