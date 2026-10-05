@@ -4,10 +4,10 @@ A mobile-first, pseudonymous discovery marketplace for verified merchant-specifi
 card offers. The platform helps people discover offers, evaluate reputation, and
 connect privately; it does not sell, transfer, broker, settle, or guarantee offers.
 
-This repository contains the Phase 1 application foundation plus the Phase 2
-Supabase Auth, pseudonymous profile, and Row Level Security foundation. Offers,
-verification evidence, checkout, messaging, ratings, and moderation are intentionally
-not implemented yet.
+This repository contains the Phase 1 application foundation, Phase 2 authentication
+and pseudonymous profiles, and the Phase 3 private card, merchant, offer, and
+verification-evidence workflow. Marketplace publishing, admin verification, checkout,
+messaging, ratings, and moderation are intentionally not implemented yet.
 
 ## Stack
 
@@ -57,9 +57,9 @@ and the publishable key so Row Level Security remains effective.
     npm run test:db
     npm run build
 
-The database test requires Docker and a running local Supabase stack (`npx supabase
-start`). It verifies profile grants, RLS isolation, protected trust fields, the safe
-public view, and database-enforced username rules.
+The database tests require Docker and a running local Supabase stack (`npx supabase
+start`). They verify profile grants, private card/offer/evidence ownership, protected
+workflow fields, Storage isolation, and database-enforced validation.
 
 ## Supabase setup
 
@@ -111,6 +111,24 @@ enable a UI badge based only on a client claim or form submission.
   flag. Database grants, RLS, and a trigger protect verification/reputation fields.
 - Route protection is enforced by the session-refresh proxy and rechecked in the
   authenticated server layout.
+
+## Phase 3 private offer boundary
+
+- `credit_card_profiles` is owner-only and stores only organizational data. Full card
+  numbers, CVV, PIN, credentials, and banking information are never accepted.
+- Authenticated users can read active merchants but cannot change the merchant catalog.
+- `offers` remains owner-only. Users can edit draft/needs-review terms but cannot set
+  verification state, verification timestamps, or active listing state.
+- Submission uses the constrained `submit_offer_for_verification` database function,
+  which requires an active owned card, active merchant, unexpired offer, and registered
+  uploaded evidence before transitioning to `PENDING` / `PENDING_VERIFICATION`.
+- `offer-verification-evidence` is a non-public, 5 MB Storage bucket limited to PNG,
+  JPEG, WebP, and PDF. Object paths contain only user, offer, and randomized UUIDs.
+- Evidence downloads are proxied through an authenticated owner route with `no-store`
+  caching; raw storage paths and public URLs are not returned to marketplace pages.
+
+The merchant catalog is inserted by the Phase 3 migration, so hosted environments need
+only `npx supabase db push`. No dashboard SQL or manual bucket creation is required.
 
 ## Railway
 

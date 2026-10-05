@@ -36,12 +36,14 @@ export default async function OffersPage({
     selectedStatus === "ALL"
       ? allOffers
       : allOffers.filter((offer) => offer.verificationStatus === selectedStatus);
+  const offersByCard = Map.groupBy(offers, (offer) => offer.cardId);
   const stats = [
     { icon: CreditCard, label: "Active cards", value: cards.filter((card) => card.status === "ACTIVE").length },
     { icon: Tags, label: "Total offers", value: allOffers.length },
     { icon: FilePenLine, label: "Drafts", value: allOffers.filter((offer) => offer.verificationStatus === "DRAFT").length },
     { icon: Clock3, label: "Pending", value: allOffers.filter((offer) => offer.verificationStatus === "PENDING").length },
     { icon: FileCheck2, label: "Verified", value: allOffers.filter((offer) => offer.verificationStatus === "VERIFIED").length },
+    { icon: Clock3, label: "Expired", value: allOffers.filter((offer) => offer.verificationStatus === "EXPIRED" || offer.listingStatus === "EXPIRED" || offer.expirationDate < new Date().toISOString().slice(0, 10)).length },
   ];
 
   return (
@@ -58,7 +60,7 @@ export default async function OffersPage({
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
         {stats.map(({ icon: Icon, label, value }) => (
           <div key={label} className="rounded-2xl border border-border bg-card p-4">
             <Icon aria-hidden="true" className="size-4 text-primary" />
@@ -88,8 +90,20 @@ export default async function OffersPage({
             </div>
           </div>
           {offers.length ? (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {offers.map((offer) => <PrivateOfferCard key={offer.id} offer={offer} />)}
+            <div className="space-y-7">
+              {Array.from(offersByCard.entries()).map(([cardId, cardOffers]) => (
+                <section key={cardId} className="space-y-3">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold">{cardOffers[0]?.cardNickname}</h3>
+                      <p className="text-xs text-muted-foreground">Private card · {cardOffers.length} {cardOffers.length === 1 ? "offer" : "offers"}</p>
+                    </div>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {cardOffers.map((offer) => <PrivateOfferCard key={offer.id} offer={offer} />)}
+                  </div>
+                </section>
+              ))}
             </div>
           ) : (
             <p className="rounded-2xl bg-muted p-5 text-sm text-muted-foreground">No offers match this status.</p>

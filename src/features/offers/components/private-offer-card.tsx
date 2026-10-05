@@ -22,7 +22,10 @@ export function PrivateOfferCard({ offer }: { offer: PrivateOfferDTO }) {
           <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">{offer.merchantName}</p>
           <h3 className="mt-2 font-semibold leading-6">{offer.title}</h3>
         </div>
-        <StatusBadge status={offer.verificationStatus} />
+        <div className="flex flex-col items-end gap-1.5">
+          <StatusBadge status={offer.verificationStatus} />
+          <StatusBadge status={offer.listingStatus} />
+        </div>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
         <div className="rounded-2xl bg-muted/70 p-3">
