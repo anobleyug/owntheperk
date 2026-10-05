@@ -1,7 +1,11 @@
 import "server-only";
-
 import Stripe from "stripe";
 
-import { serverEnv } from "@/lib/env/server";
+import { getServerEnv } from "@/lib/env/server";
 
-export const stripe = new Stripe(serverEnv.STRIPE_SECRET_KEY);
+let client: Stripe | undefined;
+
+export function getStripe(): Stripe {
+  client ??= new Stripe(getServerEnv().STRIPE_SECRET_KEY);
+  return client;
+}

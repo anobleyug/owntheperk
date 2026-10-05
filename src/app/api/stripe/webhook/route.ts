@@ -1,8 +1,8 @@
 import type Stripe from "stripe";
 
-import { serverEnv } from "@/lib/env/server";
+import { getServerEnv } from "@/lib/env/server";
 import { createPrivilegedClient } from "@/lib/supabase/admin";
-import { stripe } from "@/lib/stripe/server";
+import { getStripe } from "@/lib/stripe/server";
 
 export const runtime = "nodejs";
 
@@ -10,10 +10,13 @@ export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
   if (!signature) return new Response("Missing Stripe signature.", { status: 400 });
 
+  const stripe = getStripe();
+  const webhookSecret = getServerEnv().STRIPE_WEBHOOK_SECRET;
+
   let event: Stripe.Event;
   try {
     const rawBody = await request.text();
-    event = stripe.webhooks.constructEvent(rawBody, signature, serverEnv.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch {
     return new Response("Invalid Stripe signature.", { status: 400 });
   }

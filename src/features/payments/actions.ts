@@ -6,7 +6,7 @@ import { offerListingIdSchema } from "@/features/offers/schema";
 import { publicEnv } from "@/lib/env/client";
 import { createPrivilegedClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { stripe } from "@/lib/stripe/server";
+import { getStripe } from "@/lib/stripe/server";
 
 type ReservedConversation = {
   id: string;
@@ -38,6 +38,8 @@ export async function unlockChatAction(listingId: string) {
     .maybeSingle<ReservedConversation>();
   if (conversationError || !conversation) listingError(listingId, "error");
   if (conversation.status !== "LOCKED") redirect(`/messages/${conversation.id}`);
+
+  const stripe = getStripe();
 
   if (conversation.stripe_checkout_session_id) {
     const existing = await stripe.checkout.sessions.retrieve(conversation.stripe_checkout_session_id);
