@@ -44,20 +44,3 @@ export type PrivateOfferListingDTO = {
   cardIssuer: string;
   evidence: { id: string; status: EvidenceStatus } | null;
 };
-
-// This boundary intentionally excludes card/evidence IDs, card labels, and internal trust data.
-export type PublicOfferListingDTO = {
-  id: string;
-  merchantName: string;
-  offerTitle: string;
-  rewardAmount: number;
-  rewardType: RewardType;
-  minSpend: number;
-  askAmount: number;
-  isObo: boolean;
-  expirationDate: string;
-  username: string;
-  ratingAverage: number;
-  ratingCount: number;
-  verificationStatus: "VERIFIED";
-};

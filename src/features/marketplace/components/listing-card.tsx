@@ -1,0 +1,29 @@
+import { BadgeCheck, CalendarDays, Star } from "lucide-react";
+import Link from "next/link";
+
+import { formatExpiration, formatMoney, formatReward } from "@/features/marketplace/format";
+import type { MarketplaceListingDTO } from "@/features/marketplace/types";
+
+export function ListingCard({ listing }: { listing: MarketplaceListingDTO }) {
+  return <Link href={"/listings/" + listing.listingId} className="block rounded-3xl border border-border bg-card p-5 shadow-[0_18px_55px_-44px_rgba(16,48,51,0.6)] transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
+    <div className="flex items-start justify-between gap-4">
+      <div><p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{listing.merchantName}</p>
+        <h3 className="mt-2 text-lg font-semibold leading-6">{formatReward(listing)}</h3>
+        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{listing.offerTitle}</p>
+      </div>
+      <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-secondary text-base font-bold text-primary">{listing.merchantName.slice(0, 1)}</span>
+    </div>
+    <div className="mt-5 grid grid-cols-2 gap-3">
+      <div className="rounded-2xl bg-muted/70 p-3"><p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">Min spend</p><p className="mt-1 font-semibold">{formatMoney(listing.minSpend)}</p></div>
+      <div className="rounded-2xl bg-secondary/70 p-3"><p className="text-[11px] font-medium tracking-wide text-primary/70 uppercase">Ask</p><p className="mt-1 font-semibold text-primary">{formatMoney(listing.askAmount)}{listing.isObo ? " OBO" : ""}</p></div>
+    </div>
+    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+      <span className="inline-flex items-center gap-1 font-semibold text-primary"><BadgeCheck aria-hidden="true" className="size-4" /> Offer verified</span>
+      <span className="inline-flex items-center gap-1 text-muted-foreground"><CalendarDays aria-hidden="true" className="size-3.5" /> Expires {formatExpiration(listing.expirationDate)}</span>
+    </div>
+    <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4 text-sm">
+      <span className="truncate font-semibold">{listing.sellerUsername}</span>
+      <span className="inline-flex shrink-0 items-center gap-1 text-muted-foreground"><Star aria-hidden="true" className="size-4 fill-current text-[#b98224]" /> {listing.sellerRatingAverage.toFixed(1)} <span className="text-xs">({listing.sellerRatingCount})</span></span>
+    </div>
+  </Link>;
+}

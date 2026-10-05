@@ -5,9 +5,9 @@ card offers. The platform helps people discover offers, evaluate reputation, and
 connect privately; it does not sell, transfer, broker, settle, or guarantee offers.
 
 This repository contains the Phase 1 application foundation, Phase 2 authentication
-and pseudonymous profiles, and the Phase 3 private card, merchant, offer, and
-verification-evidence workflow. Marketplace publishing, admin verification, checkout,
-messaging, ratings, and moderation are intentionally not implemented yet.
+and pseudonymous profiles, Phase 3 private listings/evidence, and the Phase 4 admin
+verification and sanitized buyer marketplace. Checkout, messaging, ratings, and
+moderation are intentionally not implemented yet.
 
 ## Stack
 
@@ -132,6 +132,26 @@ enable a UI badge based only on a client claim or form submission.
 The merchant catalog and private bucket are migration-managed, so hosted environments
 need only `npx supabase db push`. Canonical offers must be added later through trusted
 catalog/admin tooling; normal users cannot create them.
+
+## Phase 4 verification and marketplace boundary
+
+- `user_roles` is private and database-enforced; normal users cannot promote
+  themselves or update listing verification fields.
+- Admin decisions use `review_offer_listing`, which verifies the pending state,
+  private evidence object, canonical offer, merchant, and expiration before publishing.
+- `marketplace_listings` explicitly whitelists buyer-safe fields and includes only
+  active, verified, unexpired listings from active pseudonymous profiles.
+- Marketplace search and `/listings/[id]` query only that sanitized view. Card IDs,
+  card labels, last four digits, evidence paths, auth/contact data, and risk state are
+  absent from the view.
+
+After applying migrations, assign the first administrator with trusted SQL:
+
+```sql
+update public.user_roles
+set role = 'ADMIN'
+where user_id = '<auth-user-uuid>';
+```
 
 ## Railway
 
