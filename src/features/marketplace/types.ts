@@ -6,6 +6,7 @@ export type MarketplaceSort = (typeof MARKETPLACE_SORTS)[number];
 export type MarketplaceListingDTO = {
   listingId: string;
   sellerUserId: string;
+  merchantId: string;
   merchantName: string;
   merchantSlug: string;
   offerTitle: string;

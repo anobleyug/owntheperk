@@ -2,6 +2,7 @@
 
 import {
   CirclePlus,
+  Bell,
   MessageSquareText,
   Search,
   Tags,
@@ -35,7 +36,7 @@ function isItemActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function DesktopNavigation() {
+export function DesktopNavigation({ unreadNotificationCount }: { unreadNotificationCount: number }) {
   const pathname = usePathname();
 
   return (
@@ -60,6 +61,14 @@ export function DesktopNavigation() {
           </Link>
         );
       })}
+      <Link href="/notifications" aria-current={isItemActive(pathname, "/notifications") ? "page" : undefined} className={cn(
+        "flex min-h-11 items-center gap-3 rounded-2xl px-3 text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        isItemActive(pathname, "/notifications") ? "bg-secondary text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+      )}>
+        <Bell aria-hidden="true" className="size-5" />
+        <span>Notifications</span>
+        {unreadNotificationCount > 0 && <span className="ml-auto grid min-w-6 place-items-center rounded-full bg-primary px-1.5 py-1 text-xs font-bold text-primary-foreground">{unreadNotificationCount > 99 ? "99+" : unreadNotificationCount}</span>}
+      </Link>
     </nav>
   );
 }

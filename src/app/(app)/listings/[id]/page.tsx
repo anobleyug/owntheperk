@@ -8,6 +8,8 @@ import { getMarketplaceListing } from "@/features/marketplace/data";
 import { formatExpiration, formatMoney, formatReward } from "@/features/marketplace/format";
 import { offerListingIdSchema } from "@/features/offers/schema";
 import { unlockChatAction } from "@/features/payments/actions";
+import { MerchantFollowButton } from "@/features/notifications/components/merchant-follow-button";
+import { isMerchantFollowed } from "@/features/notifications/data";
 import { SafetyActions } from "@/features/trust/components/safety-actions";
 import { hasBlockedUser } from "@/features/trust/data";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +31,10 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
   const isOwner = Boolean(ownListingResult.data);
   const conversation = conversationResult.data;
   const unlocked = conversation && conversation.status !== "LOCKED";
-  const hasBlocked = user && !isOwner ? await hasBlockedUser(supabase, user.id, listing.sellerUserId) : false;
+  const [hasBlocked, merchantFollowed] = await Promise.all([
+    user && !isOwner ? hasBlockedUser(supabase, user.id, listing.sellerUserId) : Promise.resolve(false),
+    user ? isMerchantFollowed(supabase, user.id, listing.merchantId) : Promise.resolve(false),
+  ]);
   const checkoutAction = unlockChatAction.bind(null, id);
 
   return <div className="mx-auto max-w-4xl space-y-6">
@@ -49,6 +54,11 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
         <div className="rounded-2xl bg-muted/70 p-4"><p className="text-xs text-muted-foreground">Canonical spend</p><p className="mt-2 font-semibold">{formatMoney(listing.canonicalSpendRequirement)}</p></div>
         <div className="rounded-2xl bg-muted/70 p-4"><CalendarDays aria-hidden="true" className="size-4 text-primary" /><p className="mt-2 text-xs text-muted-foreground">Expires</p><p className="mt-1 font-semibold">{formatExpiration(listing.expirationDate)}</p></div>
       </div>
+    </section>
+
+    <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div><h2 className="font-semibold">Save {listing.merchantName}</h2><p className="mt-1 text-sm text-muted-foreground">Get an in-app alert when another verified listing becomes available.</p></div>
+      <MerchantFollowButton merchantId={listing.merchantId} merchantName={listing.merchantName} initiallyFollowing={merchantFollowed} />
     </section>
 
     <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">

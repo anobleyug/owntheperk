@@ -6,10 +6,10 @@ import type { RewardType } from "@/features/offers/types";
 import type { MarketplaceFilters, MarketplaceListingDTO } from "./types";
 
 const PAGE_SIZE = 12;
-const MARKETPLACE_COLUMNS = "listing_id, seller_user_id, merchant_name, merchant_slug, offer_title, offer_description, reward_amount, reward_type, canonical_spend_requirement, min_spend, ask_amount, is_obo, expiration_date, seller_username, seller_avatar_url, seller_rating_average, seller_rating_count, seller_completed_interaction_count, verification_badge, created_at";
+const MARKETPLACE_COLUMNS = "listing_id, seller_user_id, merchant_id, merchant_name, merchant_slug, offer_title, offer_description, reward_amount, reward_type, canonical_spend_requirement, min_spend, ask_amount, is_obo, expiration_date, seller_username, seller_avatar_url, seller_rating_average, seller_rating_count, seller_completed_interaction_count, verification_badge, created_at";
 
 type MarketplaceRow = {
-  listing_id: string; seller_user_id: string; merchant_name: string; merchant_slug: string; offer_title: string;
+  listing_id: string; seller_user_id: string; merchant_id: string; merchant_name: string; merchant_slug: string; offer_title: string;
   offer_description: string; reward_amount: number | string; reward_type: RewardType;
   canonical_spend_requirement: number | string; min_spend: number | string; ask_amount: number | string;
   is_obo: boolean; expiration_date: string; seller_username: string; seller_avatar_url: string | null;
@@ -21,6 +21,7 @@ function mapMarketplaceRow(row: MarketplaceRow): MarketplaceListingDTO {
   return {
     listingId: row.listing_id,
     sellerUserId: row.seller_user_id,
+    merchantId: row.merchant_id,
     merchantName: row.merchant_name,
     merchantSlug: row.merchant_slug,
     offerTitle: row.offer_title,

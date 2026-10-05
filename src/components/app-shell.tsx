@@ -1,4 +1,5 @@
 import { Bell, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { DesktopNavigation, MobileNavigation } from "@/components/app-navigation";
@@ -12,16 +13,18 @@ export function AppShell({
   children,
   username,
   avatarUrl,
+  unreadNotificationCount,
 }: {
   children: ReactNode;
   username: string;
   avatarUrl: string | null;
+  unreadNotificationCount: number;
 }) {
   return (
     <div className="min-h-svh bg-background lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <aside className="sticky top-0 hidden h-svh border-r border-border bg-card/65 p-5 lg:flex lg:flex-col">
         <Brand href="/search" />
-        <DesktopNavigation />
+        <DesktopNavigation unreadNotificationCount={unreadNotificationCount} />
 
         <div className="mt-auto rounded-2xl border border-border bg-background p-3.5">
           <div className="flex items-center gap-2 text-xs font-semibold text-primary">
@@ -45,13 +48,14 @@ export function AppShell({
             <span className="hidden rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-primary sm:inline-flex">
               Profile protected
             </span>
-            <button
-              type="button"
+            <Link
+              href="/notifications"
               aria-label="Notifications"
-              className="grid size-10 place-items-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              className="relative grid size-10 place-items-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
               <Bell aria-hidden="true" className="size-4.5" />
-            </button>
+              {unreadNotificationCount > 0 && <span className="absolute -top-1 -right-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{unreadNotificationCount > 99 ? "99+" : unreadNotificationCount}</span>}
+            </Link>
             {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
