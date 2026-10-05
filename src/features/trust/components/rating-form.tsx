@@ -22,13 +22,13 @@ export function RatingForm({ conversationId, otherUsername }: { conversationId: 
   const [state, action, pending] = useActionState(submitRatingAction, initialState);
   if (state.status === "success") {
     return <section className="rounded-3xl border border-border bg-secondary/60 p-5" role="status">
-      <p className="inline-flex items-center gap-2 font-semibold text-primary"><Star aria-hidden="true" className="size-4 fill-current" /> Rating submitted</p>
-      <p className="mt-1 text-sm text-muted-foreground">{state.message}</p>
+      <p className="inline-flex items-center gap-2 font-semibold text-primary"><Star aria-hidden="true" className="size-4 fill-current" /> You rated {otherUsername}</p>
+      <p className="mt-1 text-sm text-muted-foreground">Your rating for this interaction was submitted and cannot be edited.</p>
     </section>;
   }
   return <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
-    <h2 className="text-lg font-semibold">Rate {otherUsername}</h2>
-    <p className="mt-1 text-sm text-muted-foreground">Share marketplace-focused feedback. Ratings are final after submission.</p>
+    <h2 className="text-lg font-semibold">Rate {otherUsername} for this interaction</h2>
+    <p className="mt-1 text-sm text-muted-foreground">Share honest feedback based only on this completed interaction. Your rating is final after submission.</p>
     <form action={action} className="mt-5 space-y-4">
       <input type="hidden" name="conversationId" value={conversationId} />
       <div className="grid grid-cols-2 gap-3">
@@ -42,7 +42,7 @@ export function RatingForm({ conversationId, otherUsername }: { conversationId: 
         <textarea name="reviewText" maxLength={500} rows={3} className="resize-none rounded-2xl border border-input bg-background px-4 py-3 text-sm" placeholder="Keep the review factual and avoid private conversation details." />
       </label>
       {state.status === "error" && <p role="alert" className="text-sm font-medium text-red-700">{state.message}</p>}
-      <Button type="submit" disabled={pending} className="w-full sm:w-auto">{pending ? "Submitting…" : "Submit final rating"}</Button>
+      <Button type="submit" disabled={pending} className="w-full sm:w-auto">{pending ? "Submitting…" : `Submit rating for ${otherUsername}`}</Button>
     </form>
   </section>;
 }

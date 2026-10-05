@@ -66,9 +66,9 @@ export default async function ConversationPage({ params }: { params: Promise<{ c
     </header>
     <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-muted/60 px-4 py-3 text-sm"><span className="text-muted-foreground">Status</span><span className="font-semibold">{conversation.status.replaceAll("_", " ").toLowerCase()}</span></div>
     <ConversationThread conversationId={conversation.id} currentUserId={user.id} initialMessages={messages} canSend={conversation.status === "ACTIVE" && !hasBlocked} />
-    {conversation.status === "ACTIVE" && <InteractionActions conversationId={conversation.id} />}
+    {conversation.status === "ACTIVE" && <InteractionActions conversationId={conversation.id} otherUsername={conversation.otherUsername} />}
     {conversation.status === "COMPLETED" && !hasRated && <RatingForm conversationId={conversation.id} otherUsername={conversation.otherUsername} />}
-    {conversation.status === "COMPLETED" && hasRated && <section className="rounded-3xl border border-border bg-secondary/50 p-5"><p className="font-semibold text-primary">Rating submitted</p><p className="mt-1 text-sm text-muted-foreground">Your rating is final and contributes to this member&apos;s reputation.</p></section>}
+    {conversation.status === "COMPLETED" && hasRated && <section className="rounded-3xl border border-border bg-secondary/50 p-5"><p className="font-semibold text-primary">You rated {conversation.otherUsername}</p><p className="mt-1 text-sm text-muted-foreground">Your rating for this interaction is final and contributes to their marketplace reputation.</p></section>}
     <SafetyActions targetUserId={conversation.otherUserId} conversationId={conversation.id} offerListingId={conversation.listingId} initiallyBlocked={hasBlocked} />
   </div>;
 }
