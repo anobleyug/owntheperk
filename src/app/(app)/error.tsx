@@ -1,14 +1,11 @@
 "use client";
 
 import { AlertTriangle, RotateCcw } from "lucide-react";
-import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 
 export default function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
+  void error.digest;
 
   return (
     <section role="alert" className="mx-auto max-w-xl rounded-3xl border border-red-200 bg-card p-6 text-center shadow-sm sm:p-8">

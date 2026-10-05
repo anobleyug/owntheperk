@@ -21,8 +21,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return new NextResponse(await file.arrayBuffer(), {
     headers: {
       "Cache-Control": "private, no-store, max-age=0",
-      "Content-Disposition": "inline",
+      "Content-Disposition": "attachment; filename=offer-evidence",
       "Content-Type": file.type || "application/octet-stream",
+      "Content-Security-Policy": "default-src 'none'; sandbox",
+      "Cross-Origin-Resource-Policy": "same-origin",
       "X-Content-Type-Options": "nosniff",
     },
   });

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimits } from "@/lib/security/rate-limit";
 import { containsSensitiveContent } from "./sensitive-content";
 import type { MessageDTO } from "./types";
 
@@ -49,6 +50,13 @@ export async function sendMessageAction(
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { status: "error", message: "Sign in to send messages." };
+  const rateLimit = await checkRateLimits([{
+    scope: "MESSAGE_SEND",
+    subject: `user:${user.id}`,
+    limit: 20,
+    windowSeconds: 60,
+  }]);
+  if (!rateLimit.allowed) return { status: "error", message: "You are sending messages too quickly. Try again shortly." };
 
   const { data, error } = await supabase.from("messages")
     .insert({

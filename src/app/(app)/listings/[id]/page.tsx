@@ -78,6 +78,7 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
       {query.unlock === "cancelled" && <p role="status" className="mt-2 text-center text-xs font-medium text-muted-foreground">Checkout was cancelled. You were not charged.</p>}
       {query.unlock === "unavailable" && <p role="alert" className="mt-2 text-center text-xs font-medium text-red-700">This listing is no longer available to unlock.</p>}
       {query.unlock === "error" && <p role="alert" className="mt-2 text-center text-xs font-medium text-red-700">Chat checkout could not be started. Please try again.</p>}
+      {query.unlock === "rate_limited" && <p role="alert" className="mt-2 text-center text-xs font-medium text-red-700">Too many checkout attempts. Try again later.</p>}
     </section>
   </div>;
 }

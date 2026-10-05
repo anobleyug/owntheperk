@@ -16,6 +16,12 @@ export default function robots(): MetadataRoute.Robots {
         "/admin",
         "/onboarding",
         "/account-suspended",
+        "/auth",
+        "/api",
+        "/login",
+        "/signup",
+        "/forgot-password",
+        "/reset-password",
       ],
     },
   };

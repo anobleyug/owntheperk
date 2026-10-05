@@ -39,6 +39,7 @@ export default async function OfferListingDetailPage({ params, searchParams }: {
     {listingFee === "cancelled" ? <p role="status" className="rounded-2xl bg-muted p-4 text-sm text-muted-foreground">Checkout was cancelled. You were not charged and your listing remains a draft.</p> : null}
     {listingFee === "incomplete" ? <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">Add an asking amount and private evidence before paying the listing fee.</p> : null}
     {listingFee === "error" || listingFee === "unavailable" ? <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">Listing checkout could not be started. Refresh and try again.</p> : null}
+    {listingFee === "rate_limited" ? <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">Too many checkout attempts. Try again later.</p> : null}
 
     <section className="rounded-3xl border border-border bg-card p-5 sm:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">

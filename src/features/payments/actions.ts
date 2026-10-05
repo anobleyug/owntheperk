@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 
 import { offerListingIdSchema } from "@/features/offers/schema";
 import { publicEnv } from "@/lib/env/client";
+import { checkRateLimits } from "@/lib/security/rate-limit";
+import { safeStripeCheckoutUrl } from "@/lib/security/redirects";
 import { createPrivilegedClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe/server";
@@ -14,6 +16,7 @@ type ReservedConversation = {
   id: string;
   status: "LOCKED" | "ACTIVE" | "COMPLETED" | "NO_AGREEMENT" | "CLOSED" | "REPORTED";
   stripe_checkout_session_id: string | null;
+  checkout_attempt: number;
 };
 
 type ListingFeePayment = {
@@ -33,6 +36,10 @@ export async function unlockChatAction(listingId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/listings/${listingId}`);
+  const rateLimit = await checkRateLimits([{
+    scope: "CHECKOUT_CREATE", subject: `user:${user.id}`, limit: 10, windowSeconds: 600,
+  }]);
+  if (!rateLimit.allowed) listingError(listingId, "rate_limited");
 
   const { data: conversationId, error: reserveError } = await supabase.rpc(
     "reserve_chat_conversation",
@@ -41,12 +48,14 @@ export async function unlockChatAction(listingId: string) {
   if (reserveError || typeof conversationId !== "string") listingError(listingId, "unavailable");
 
   const admin = createPrivilegedClient();
-  const { data: conversation, error: conversationError } = await admin
+  const conversationResult = await admin
     .from("conversations")
-    .select("id, status, stripe_checkout_session_id")
+    .select("id, status, stripe_checkout_session_id, checkout_attempt")
     .eq("id", conversationId)
     .eq("buyer_user_id", user.id)
     .maybeSingle<ReservedConversation>();
+  let conversation = conversationResult.data;
+  const conversationError = conversationResult.error;
   if (conversationError || !conversation) listingError(listingId, "error");
   if (conversation.status !== "LOCKED") redirect(`/messages/${conversation.id}`);
 
@@ -54,8 +63,29 @@ export async function unlockChatAction(listingId: string) {
 
   if (conversation.stripe_checkout_session_id) {
     const existing = await stripe.checkout.sessions.retrieve(conversation.stripe_checkout_session_id);
-    if (existing.status === "open" && existing.url) redirect(existing.url);
+    const existingUrl = safeStripeCheckoutUrl(existing.url);
+    if (existing.status === "open" && existingUrl) redirect(existingUrl);
     if (existing.status === "complete") redirect(`/messages/${conversation.id}?payment=processing`);
+
+    const expiredSessionId = conversation.stripe_checkout_session_id;
+    const { data: refreshed, error: refreshError } = await admin.from("conversations")
+      .update({
+        stripe_checkout_session_id: null,
+        stripe_payment_intent_id: null,
+        checkout_attempt: conversation.checkout_attempt + 1,
+      })
+      .eq("id", conversation.id)
+      .eq("status", "LOCKED")
+      .eq("stripe_checkout_session_id", expiredSessionId)
+      .select("id, status, stripe_checkout_session_id, checkout_attempt")
+      .maybeSingle<ReservedConversation>();
+    if (refreshError || !refreshed) listingError(listingId, "processing");
+    await admin.from("platform_payments")
+      .update({ status: "FAILED" })
+      .eq("conversation_id", conversation.id)
+      .eq("stripe_checkout_session_id", expiredSessionId)
+      .eq("status", "PENDING");
+    conversation = refreshed;
   }
 
   const checkout = await stripe.checkout.sessions.create({
@@ -88,10 +118,11 @@ export async function unlockChatAction(listingId: string) {
     success_url: `${publicEnv.NEXT_PUBLIC_APP_URL}/messages/${conversation.id}?payment=success`,
     cancel_url: `${publicEnv.NEXT_PUBLIC_APP_URL}/listings/${listingId}?unlock=cancelled`,
   }, {
-    idempotencyKey: `chat-unlock-${conversation.id}`,
+    idempotencyKey: `chat-unlock-${conversation.id}-${conversation.checkout_attempt}`,
   });
 
-  if (!checkout.url) listingError(listingId, "error");
+  const checkoutUrl = safeStripeCheckoutUrl(checkout.url);
+  if (!checkoutUrl) listingError(listingId, "error");
 
   const { error: attachError } = await admin
     .from("conversations")
@@ -111,7 +142,7 @@ export async function unlockChatAction(listingId: string) {
     status: "PENDING",
   }, { onConflict: "stripe_checkout_session_id", ignoreDuplicates: true });
 
-  redirect(checkout.url);
+  redirect(checkoutUrl);
 }
 
 function listingFeeError(listingId: string, code: string): never {
@@ -124,6 +155,10 @@ export async function payListingSubmissionFeeAction(listingId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/offers/${listingId}`);
+  const rateLimit = await checkRateLimits([{
+    scope: "CHECKOUT_CREATE", subject: `user:${user.id}`, limit: 10, windowSeconds: 600,
+  }]);
+  if (!rateLimit.allowed) listingFeeError(listingId, "rate_limited");
 
   const [{ data: listing }, { data: evidence }] = await Promise.all([
     supabase.from("offer_listings")
@@ -159,7 +194,8 @@ export async function payListingSubmissionFeeAction(listingId: string) {
   const stripe = getStripe();
   if (payment?.stripe_checkout_session_id) {
     const existing = await stripe.checkout.sessions.retrieve(payment.stripe_checkout_session_id);
-    if (existing.status === "open" && existing.url) redirect(existing.url);
+    const existingUrl = safeStripeCheckoutUrl(existing.url);
+    if (existing.status === "open" && existingUrl) redirect(existingUrl);
     if (existing.status === "complete") redirect(`/offers/${listingId}?listingFee=processing`);
 
     const { data: refreshed, error: refreshError } = await admin.from("platform_payments")
@@ -208,7 +244,8 @@ export async function payListingSubmissionFeeAction(listingId: string) {
   if (payment.status === "SUCCEEDED") redirect(`/offers/${listingId}?listingFee=paid`);
   if (payment.stripe_checkout_session_id) {
     const concurrentCheckout = await stripe.checkout.sessions.retrieve(payment.stripe_checkout_session_id);
-    if (concurrentCheckout.url) redirect(concurrentCheckout.url);
+    const concurrentUrl = safeStripeCheckoutUrl(concurrentCheckout.url);
+    if (concurrentUrl) redirect(concurrentUrl);
     listingFeeError(listingId, "processing");
   }
 
@@ -243,7 +280,8 @@ export async function payListingSubmissionFeeAction(listingId: string) {
   }, {
     idempotencyKey: `listing-fee-${payment.id}-${payment.checkout_attempt}`,
   });
-  if (!checkout.url) listingFeeError(listingId, "error");
+  const checkoutUrl = safeStripeCheckoutUrl(checkout.url);
+  if (!checkoutUrl) listingFeeError(listingId, "error");
 
   const { data: attached, error: attachError } = await admin.from("platform_payments")
     .update({ stripe_checkout_session_id: checkout.id })
@@ -254,5 +292,5 @@ export async function payListingSubmissionFeeAction(listingId: string) {
     .maybeSingle();
   if (attachError || !attached) listingFeeError(listingId, "error");
 
-  redirect(checkout.url);
+  redirect(checkoutUrl);
 }

@@ -2,13 +2,12 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import { PwaLifecycle } from "@/components/pwa-lifecycle";
+import { publicEnv } from "@/lib/env/client";
 
 import "./globals.css";
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(appUrl),
+  metadataBase: new URL(publicEnv.NEXT_PUBLIC_APP_URL),
   title: {
     default: "Own the Perk",
     template: "%s · Own the Perk",

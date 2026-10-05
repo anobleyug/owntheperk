@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import type { ConversationStatus } from "@/features/messages/types";
 import { createPrivilegedClient } from "@/lib/supabase/admin";
+import { checkRateLimits } from "@/lib/security/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { blockSchema, ratingSchema, reportSchema } from "./schema";
 import type { TrustActionState } from "./types";
@@ -99,6 +100,13 @@ export async function submitReportAction(
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { status: "error", message: "Sign in to submit a report." };
+  const rateLimit = await checkRateLimits([{
+    scope: "REPORT_CREATE",
+    subject: `user:${user.id}`,
+    limit: 5,
+    windowSeconds: 3600,
+  }]);
+  if (!rateLimit.allowed) return { status: "error", message: "Report limit reached. Try again later." };
   const reportedUserId = formData.get("reportedUserId")
     || await resolveListingSeller(formData.get("offerListingId"), user.id);
   const parsed = reportSchema.safeParse({

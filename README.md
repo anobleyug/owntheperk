@@ -40,6 +40,7 @@ Copy .env.example to .env.local and provide:
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
     STRIPE_SECRET_KEY=
     STRIPE_WEBHOOK_SECRET=
+    RATE_LIMIT_SECRET=
 
     NEXT_PUBLIC_APP_URL=http://localhost:3000
 
@@ -92,6 +93,8 @@ In the hosted Supabase dashboard, configure the following Auth settings:
    `supabase/templates`. The CLI configuration already wires them for local Supabase.
 5. Keep leaked-password protection and suitable Auth rate limits enabled where the
    Supabase plan supports them.
+6. Enable CAPTCHA for signup/sign-in in production. Application rate limits are an
+   additional layer and do not replace Supabase Auth endpoint limits.
 
 Phone verification is deliberately not simulated. The schema reserves the trusted
 `phone_verified` field, which normal users cannot update. To add the real flow, choose
@@ -166,7 +169,11 @@ To deploy:
 2. Add every variable from .env.example in Railway Variables.
 3. Set NEXT_PUBLIC_APP_URL to the generated Railway or custom HTTPS domain.
 4. Set the service health-check path to /api/health.
-5. Generate a public domain and deploy.
+5. Generate RATE_LIMIT_SECRET with at least 32 random characters and keep it only in
+   Railway runtime variables.
+6. Confirm the Stripe webhook endpoint is the exact production
+   `/api/stripe/webhook` URL and subscribe to `checkout.session.completed`.
+7. Generate a public domain and deploy.
 
 Supabase remains the database, authentication, realtime, and private-storage
 provider; no Railway Postgres service is required.

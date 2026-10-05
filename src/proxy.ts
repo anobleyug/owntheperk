@@ -38,7 +38,7 @@ export async function proxy(request: NextRequest) {
   const isResetPage = pathname === "/reset-password";
 
   function redirectWithCookies(path: string) {
-    const redirectResponse = NextResponse.redirect(new URL(path, request.url));
+    const redirectResponse = NextResponse.redirect(new URL(path, publicEnv.NEXT_PUBLIC_APP_URL));
     response.cookies.getAll().forEach((cookie) => redirectResponse.cookies.set(cookie));
     return redirectResponse;
   }

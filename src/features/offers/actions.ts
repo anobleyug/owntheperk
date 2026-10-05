@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import type { FormState } from "@/features/auth/types";
+import { checkRateLimits } from "@/lib/security/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 import { EVIDENCE_BUCKET, validateEvidenceFile } from "./evidence";
@@ -122,6 +123,13 @@ export async function createOfferListingAction(_state: FormState, formData: Form
   }
 
   const { supabase, user } = await authenticatedClient();
+  const rateLimit = await checkRateLimits([{
+    scope: "LISTING_CREATE",
+    subject: `user:${user.id}`,
+    limit: 10,
+    windowSeconds: 3600,
+  }]);
+  if (!rateLimit.allowed) return { status: "error", message: "Listing creation limit reached. Try again later." };
   if (!(await validateAssociations(supabase, user.id, parsed.data.cardId, parsed.data.offerId))) {
     return { status: "error", message: "Select an active card and current credit card offer." };
   }

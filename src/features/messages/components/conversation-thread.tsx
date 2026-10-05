@@ -102,11 +102,7 @@ export function ConversationThread({
           }]);
           if (row.sender_id !== currentUserId) void markConversationReadAction(conversationId);
         })
-        .subscribe((status: string, err?: Error) => {
-            if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-              console.error("[rt]", status, err);
-            }
-        });
+        .subscribe();
     });
 
     void markConversationReadAction(conversationId);
