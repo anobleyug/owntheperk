@@ -71,42 +71,26 @@ export function ConversationThread({
 
   useEffect(() => {
     const supabase = createClient();
-    let channel: ReturnType<typeof supabase.channel> | undefined;
-    let cancelled = false;
-
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      console.log("[rt] session:", !!data.session);
-      // Make sure the socket joins as the signed-in user, not anon, so RLS lets the row through.
-      supabase.realtime.setAuth(data.session?.access_token ?? null);
-
-      channel = supabase.channel(`conversation:${conversationId}`)
-        .on("postgres_changes", {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        }, (payload: RealtimePostgresChangesPayload<MessageRow>) => {
-          console.log("[rt] event:", payload.new);
-          const row = payload.new as MessageRow;
-          setMessages((current) => current.some((message) => message.id === row.id) ? current : [...current, {
-            id: row.id,
-            conversationId: row.conversation_id,
-            senderId: row.sender_id,
-            content: row.content,
-            createdAt: row.created_at,
-            readAt: row.read_at,
-          }]);
-          if (row.sender_id !== currentUserId) void markConversationReadAction(conversationId);
-        })
-        .subscribe((status, err) => console.log("[rt] status:", status, err));
-    });
-
+    const channel = supabase.channel(`conversation:${conversationId}`)
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversationId}`,
+      }, (payload: RealtimePostgresChangesPayload<MessageRow>) => {
+        const row = payload.new as MessageRow;
+        setMessages((current) => current.some((message) => message.id === row.id) ? current : [...current, {
+          id: row.id,
+          conversationId: row.conversation_id,
+          senderId: row.sender_id,
+          content: row.content,
+          createdAt: row.created_at,
+          readAt: row.read_at,
+        }]);
+        if (row.sender_id !== currentUserId) void markConversationReadAction(conversationId);
+      }).subscribe();
     void markConversationReadAction(conversationId);
-    return () => {
-      cancelled = true;
-      if (channel) void supabase.removeChannel(channel);
-    };
+    return () => { void supabase.removeChannel(channel); };
   }, [conversationId, currentUserId]);
 
   useEffect(() => {
