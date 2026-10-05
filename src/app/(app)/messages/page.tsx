@@ -1,9 +1,16 @@
-import { LockKeyhole, MessageSquareText } from "lucide-react";
+import { MessageSquareText } from "lucide-react";
+import Link from "next/link";
 
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { getConversations } from "@/features/messages/data";
+import { formatMoney } from "@/features/marketplace/format";
+import { createClient } from "@/lib/supabase/server";
 
-export default function MessagesPage() {
+export default async function MessagesPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const conversations = user ? await getConversations(supabase, user.id) : [];
   return (
     <div className="space-y-8">
       <PageHeader
@@ -11,17 +18,20 @@ export default function MessagesPage() {
         title="Messages"
         description="Only conversation participants will be able to access message history."
       />
-      <EmptyState
+      {conversations.length === 0 ? <EmptyState
         icon={MessageSquareText}
         title="No conversations yet"
-        description="Paid chat unlocks and Supabase Realtime messaging are intentionally deferred beyond this foundation phase."
-        action={
-          <span className="inline-flex items-center gap-2 text-xs font-semibold text-primary">
-            <LockKeyhole aria-hidden="true" className="size-4" />
-            Participant-only access planned
-          </span>
-        }
-      />
+        description="Unlock chat from a verified listing to start a private conversation."
+      /> : <div className="space-y-3">{conversations.map((conversation) => (
+        <Link key={conversation.id} href={`/messages/${conversation.id}`} className="flex min-h-24 items-center justify-between gap-4 rounded-3xl border border-border bg-card p-4 transition-colors hover:bg-muted/40 sm:p-5">
+          <div className="min-w-0">
+            <p className="truncate text-xs font-semibold tracking-[0.1em] text-primary uppercase">{conversation.merchantName}</p>
+            <h2 className="mt-1 truncate font-semibold">{conversation.otherUsername}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Ask {formatMoney(conversation.askAmount)}{conversation.isObo ? " OBO" : ""}</p>
+          </div>
+          {conversation.unreadCount > 0 && <span className="grid min-w-6 place-items-center rounded-full bg-primary px-1.5 py-1 text-xs font-bold text-primary-foreground" aria-label={`${conversation.unreadCount} unread messages`}>{conversation.unreadCount}</span>}
+        </Link>
+      ))}</div>}
     </div>
   );
 }

@@ -7,16 +7,27 @@ import { Button } from "@/components/ui/button";
 import { getMarketplaceListing } from "@/features/marketplace/data";
 import { formatExpiration, formatMoney, formatReward } from "@/features/marketplace/format";
 import { offerListingIdSchema } from "@/features/offers/schema";
+import { unlockChatAction } from "@/features/payments/actions";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Verified offer listing" };
 
-export default async function MarketplaceListingPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function MarketplaceListingPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ unlock?: string }> }) {
   const { id } = await params;
+  const query = await searchParams;
   if (!offerListingIdSchema.safeParse(id).success) notFound();
   const supabase = await createClient();
-  const listing = await getMarketplaceListing(supabase, id);
+  const { data: { user } } = await supabase.auth.getUser();
+  const [listing, ownListingResult, conversationResult] = await Promise.all([
+    getMarketplaceListing(supabase, id),
+    user ? supabase.from("offer_listings").select("id").eq("id", id).eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null }),
+    user ? supabase.from("conversations").select("id, status").eq("listing_id", id).eq("buyer_user_id", user.id).maybeSingle<{ id: string; status: string }>() : Promise.resolve({ data: null }),
+  ]);
   if (!listing) notFound();
+  const isOwner = Boolean(ownListingResult.data);
+  const conversation = conversationResult.data;
+  const unlocked = conversation && conversation.status !== "LOCKED";
+  const checkoutAction = unlockChatAction.bind(null, id);
 
   return <div className="mx-auto max-w-4xl space-y-6">
     <Link href="/search" className="inline-flex min-h-10 items-center text-sm font-semibold text-muted-foreground hover:text-foreground">← Back to marketplace</Link>
@@ -51,8 +62,15 @@ export default async function MarketplaceListingPage({ params }: { params: Promi
     </section>
 
     <section className="sticky bottom-20 rounded-3xl border border-border bg-background/95 p-4 shadow-lg backdrop-blur lg:bottom-4">
-      <Button type="button" size="lg" className="w-full" disabled>Unlock Chat — $1.99</Button>
-      <p className="mt-2 text-center text-xs text-muted-foreground">Chat unlock is coming in the next payment phase. No payment is collected yet.</p>
+      {isOwner ? <Button type="button" size="lg" className="w-full" disabled>Your Listing</Button>
+        : unlocked ? <Button asChild size="lg" className="w-full"><Link href={`/messages/${conversation.id}`}>Open Conversation</Link></Button>
+          : <form action={checkoutAction}><Button type="submit" size="lg" className="w-full">Unlock Chat — $1.99</Button></form>}
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        {isOwner ? "You cannot unlock chat on your own listing." : unlocked ? "Your private conversation is ready." : "One-time platform fee for access to this conversation."}
+      </p>
+      {query.unlock === "cancelled" && <p role="status" className="mt-2 text-center text-xs font-medium text-muted-foreground">Checkout was cancelled. You were not charged.</p>}
+      {query.unlock === "unavailable" && <p role="alert" className="mt-2 text-center text-xs font-medium text-red-700">This listing is no longer available to unlock.</p>}
+      {query.unlock === "error" && <p role="alert" className="mt-2 text-center text-xs font-medium text-red-700">Chat checkout could not be started. Please try again.</p>}
     </section>
   </div>;
 }
