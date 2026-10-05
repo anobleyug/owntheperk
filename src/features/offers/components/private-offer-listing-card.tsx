@@ -21,7 +21,7 @@ export function PrivateOfferListingCard({ listing }: { listing: PrivateOfferList
       <div className="rounded-2xl bg-muted/70 p-3"><p className="text-xs text-muted-foreground">Min spend</p><p className="mt-1 font-semibold">USD {listing.minSpend.toLocaleString()}</p></div>
       <div className="rounded-2xl bg-muted/70 p-3"><p className="text-xs text-muted-foreground">Ask</p><p className="mt-1 font-semibold">{listing.askAmount === null ? "Set an ask" : "$" + listing.askAmount.toLocaleString() + (listing.isObo ? " OBO" : "")}</p></div>
     </div>
-    <p className="mt-3 text-xs text-muted-foreground">Canonical benefit: {rewardLabel(listing)}</p>
+    <p className="mt-3 text-xs text-muted-foreground">Credit Card Offer: {rewardLabel(listing)}</p>
     <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
       <span className="inline-flex items-center gap-1.5"><CreditCard aria-hidden="true" className="size-3.5" />{listing.cardNickname}</span>
       <span className="inline-flex items-center gap-1.5"><CalendarDays aria-hidden="true" className="size-3.5" />Expires {listing.expirationDate}</span>
