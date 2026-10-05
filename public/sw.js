@@ -1,8 +1,8 @@
-const CACHE_NAME = "own-the-perk-shell-v1";
-const PUBLIC_SHELL = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
+const CACHE_NAME = "own-the-perk-assets-v2";
+const PUBLIC_ASSETS = ["/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PUBLIC_SHELL)));
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PUBLIC_ASSETS)));
   self.skipWaiting();
 });
 
@@ -20,7 +20,11 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
 
-  if (PUBLIC_SHELL.includes(url.pathname)) {
+  // Never cache HTML. A cached document can reference hashed Next.js assets that
+  // no longer exist after a deployment, leaving installed mobile PWAs unstyled.
+  if (request.mode === "navigate") return;
+
+  if (PUBLIC_ASSETS.includes(url.pathname)) {
     event.respondWith(
       caches.match(request).then((cached) => cached || fetch(request).then((response) => {
         const copy = response.clone();

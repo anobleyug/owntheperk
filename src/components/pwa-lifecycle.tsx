@@ -19,7 +19,10 @@ export function PwaLifecycle() {
 
   useEffect(() => {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
-      void navigator.serviceWorker.register("/sw.js", { scope: "/" });
+      void navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+        updateViaCache: "none",
+      });
     }
 
     const handleOffline = () => {
