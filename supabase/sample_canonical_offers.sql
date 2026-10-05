@@ -1,4 +1,4 @@
--- Sample canonical offers for development/testing only.
+-- Sample credit card offers for development/testing only.
 -- These are illustrative records, not claims about currently available real-world card offers.
 -- Assumes merchants already exist in public.merchants and reward types include:
 -- STATEMENT_CREDIT, CASH_BACK, PERCENT_BACK.

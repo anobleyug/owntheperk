@@ -21,7 +21,7 @@ export default async function AdminVerificationsPage({ searchParams }: {
   const [verifications, query] = await Promise.all([getPendingVerifications(supabase), searchParams]);
 
   return <div className="space-y-8">
-    <PageHeader eyebrow="Admin · private evidence" title="Offer-listing verification" description="Compare each cardholder's private evidence with the referenced canonical offer before publishing." />
+    <PageHeader eyebrow="Admin · private evidence" title="Offer-listing verification" description="Compare each cardholder's private evidence with the referenced credit card offer before publishing." />
     {query.review === "success" ? <p className="rounded-2xl bg-secondary p-4 text-sm text-secondary-foreground">Review decision saved.</p> : null}
     {query.review === "error" ? <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">The review could not be completed. Refresh and confirm the listing is still pending.</p> : null}
     {verifications.length ? <div className="space-y-5">{verifications.map((verification) => <VerificationCard key={verification.listingId} verification={verification} />)}</div> :

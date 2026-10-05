@@ -20,7 +20,7 @@ update public.offers set status = 'EXPIRED' where id = 'aaaaaaaa-1000-4000-8000-
 
 select is((select relrowsecurity from pg_class where oid = 'public.credit_card_profiles'::regclass), true, 'cards have RLS');
 select is((select relrowsecurity from pg_class where oid = 'public.merchants'::regclass), true, 'merchants have RLS');
-select is((select relrowsecurity from pg_class where oid = 'public.offers'::regclass), true, 'canonical offers have RLS');
+select is((select relrowsecurity from pg_class where oid = 'public.offers'::regclass), true, 'credit card offers have RLS');
 select is((select relrowsecurity from pg_class where oid = 'public.offer_listings'::regclass), true, 'offer listings have RLS');
 select is((select relrowsecurity from pg_class where oid = 'public.offer_listing_verifications'::regclass), true, 'listing evidence has RLS');
 select is((select public from storage.buckets where id = 'offer-verification-evidence'), false, 'evidence bucket is private');
@@ -28,7 +28,7 @@ select is((select public from storage.buckets where id = 'offer-verification-evi
 select ok(
   not has_table_privilege('authenticated', 'public.offers', 'INSERT')
   and not has_table_privilege('authenticated', 'public.offers', 'UPDATE'),
-  'normal users cannot mutate canonical offers'
+  'normal users cannot mutate credit card offers'
 );
 select ok(
   not has_column_privilege('authenticated', 'public.offer_listings', 'verification_status', 'update')
@@ -65,7 +65,7 @@ values
 
 select is((select count(*)::integer from public.offer_listings where card_id = '44444444-0000-4000-8000-000000000001'), 2, 'one card can have multiple listings');
 select is((select count(distinct card_id)::integer from public.offer_listings), 2, 'a user can list across multiple cards');
-select is((select count(*)::integer from public.offer_listings where offer_id = 'aaaaaaaa-1000-4000-8000-000000000001'), 2, 'multiple listings can share one canonical offer');
+select is((select count(*)::integer from public.offer_listings where offer_id = 'aaaaaaaa-1000-4000-8000-000000000001'), 2, 'multiple listings can share one credit card offer');
 
 select throws_ok(
   $$ insert into public.offer_listings (user_id, card_id, offer_id, min_spend, ask_amount) values (auth.uid(), '55555555-0000-4000-8000-000000000001', 'aaaaaaaa-1000-4000-8000-000000000002', 10, 5) $$,
@@ -94,7 +94,7 @@ select lives_ok(
 );
 select throws_ok(
   $$ update public.offer_listings set offer_id = 'aaaaaaaa-1000-4000-8000-000000000002' where id = '44444444-1000-4000-8000-000000000001' $$,
-  '42501', 'The canonical offer cannot change after evidence is attached.', 'attached evidence remains bound to its canonical offer'
+  '42501', 'The credit card offer cannot change after evidence is attached.', 'attached evidence remains bound to its credit card offer'
 );
 select throws_ok(
   $$ insert into public.offer_listing_verifications (user_id, offer_listing_id, card_id, evidence_path) values ('55555555-5555-4555-8555-555555555555', '44444444-1000-4000-8000-000000000002', '44444444-0000-4000-8000-000000000001', '55555555-5555-4555-8555-555555555555/44444444-1000-4000-8000-000000000002/55555555-2000-4000-8000-000000000001.png') $$,
@@ -117,21 +117,21 @@ set local role authenticated;
 
 select throws_ok(
   $$ select public.submit_offer_listing_for_verification('44444444-1000-4000-8000-000000000004') $$,
-  '22023', 'Expired offers cannot be submitted.', 'expired canonical offers cannot be submitted'
+  '22023', 'Expired offers cannot be submitted.', 'expired credit card offers cannot be submitted'
 );
 select is((select count(*)::integer from public.merchants), 10, 'authenticated users read active seeded merchants');
-select is((select count(*)::integer from public.offers), 4, 'authenticated users read canonical offers');
+select is((select count(*)::integer from public.offers), 4, 'authenticated users read credit card offers');
 select throws_ok($$ insert into public.merchants (name, slug) values ('Unauthorized', 'unauthorized') $$, '42501', null, 'normal users cannot create merchants');
 select throws_ok(
   $$ update public.offers set title = 'Unauthorized canonical edit' where id = 'aaaaaaaa-1000-4000-8000-000000000001' $$,
-  '42501', null, 'normal users cannot edit canonical offers'
+  '42501', null, 'normal users cannot edit credit card offers'
 );
 
 select set_config('request.jwt.claims', '{"sub":"55555555-5555-4555-8555-555555555555","role":"authenticated"}', true);
 select is((select count(*)::integer from public.offer_listing_verifications), 0, 'another user cannot read evidence metadata');
 select is((select count(*)::integer from storage.objects where bucket_id = 'offer-verification-evidence'), 0, 'another user cannot read evidence objects');
 select is((select count(*)::integer from public.offer_listings), 0, 'another user cannot read private listings');
-select is((select count(*)::integer from public.offers), 4, 'canonical offers remain shared read-only catalog data');
+select is((select count(*)::integer from public.offers), 4, 'credit card offers remain shared read-only catalog data');
 
 reset role;
 select * from finish();

@@ -30,7 +30,7 @@ export default async function OfferListingDetailPage({ params, searchParams }: {
   return <div className="space-y-8">
     <Link href="/offers" className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"><ArrowLeft aria-hidden="true" className="size-4" /> My offers</Link>
     {submission === "success" ? <p className="rounded-2xl bg-secondary p-4 text-sm text-secondary-foreground">Listing submitted for verification.</p> : null}
-    {submission === "error" ? <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">Submission failed. Confirm the canonical offer is current, the listing has an ask, and private evidence exists.</p> : null}
+    {submission === "error" ? <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm text-red-800">Submission failed. Confirm the credit card offer is current, the listing has an ask, and private evidence exists.</p> : null}
 
     <section className="rounded-3xl border border-border bg-card p-5 sm:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">

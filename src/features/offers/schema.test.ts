@@ -22,7 +22,7 @@ describe("offerListingFormSchema", () => {
     expect(offerListingFormSchema.safeParse({ ...validListing, askAmount: amount }).success).toBe(false);
   });
 
-  it("requires a canonical offer UUID", () => {
+  it("requires a credit card offer UUID", () => {
     expect(offerListingFormSchema.safeParse({ ...validListing, offerId: "" }).success).toBe(false);
   });
 

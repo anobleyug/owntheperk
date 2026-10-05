@@ -77,14 +77,14 @@ export default async function SearchPage({ searchParams }: {
       </div>
     </form>
 
-    <div className="flex items-center justify-between gap-4"><div><h2 className="text-lg font-semibold">{total} verified {total === 1 ? "listing" : "listings"}</h2><p className="mt-1 text-sm text-muted-foreground">Grouped by merchant and canonical offer.</p></div></div>
+    <div className="flex items-center justify-between gap-4"><div><h2 className="text-lg font-semibold">{total} verified {total === 1 ? "listing" : "listings"}</h2><p className="mt-1 text-sm text-muted-foreground">Grouped by merchant and credit card offer.</p></div></div>
     {listings.length ? <div className="space-y-8">
       {Array.from(grouped.entries()).map(([groupKey, groupListings]) => {
         const offer = groupListings[0]!;
         return <section key={groupKey} className="space-y-3">
           <div><p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{offer.merchantName}</p>
             <h3 className="mt-1 text-lg font-semibold">{formatReward(offer)} · {offer.offerTitle}</h3>
-            <p className="mt-1 text-xs text-muted-foreground">{groupListings.length} seller {groupListings.length === 1 ? "listing" : "listings"} for this canonical offer</p>
+            <p className="mt-1 text-xs text-muted-foreground">{groupListings.length} seller {groupListings.length === 1 ? "listing" : "listings"} for this credit card offer</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{groupListings.map((listing) => <ListingCard key={listing.listingId} listing={listing} />)}</div>
         </section>;

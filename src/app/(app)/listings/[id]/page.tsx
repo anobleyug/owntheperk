@@ -44,7 +44,7 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
         <div><p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{listing.merchantName}</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em]">{formatReward(listing)}</h1>
           <p className="mt-2 text-lg font-medium">{listing.offerTitle}</p>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{listing.offerDescription || "No additional canonical offer description."}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{listing.offerDescription || "No additional credit card offer description."}</p>
         </div>
         <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-primary"><BadgeCheck aria-hidden="true" className="size-4" /> Offer verified</span>
       </div>

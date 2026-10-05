@@ -123,7 +123,7 @@ export async function createOfferListingAction(_state: FormState, formData: Form
 
   const { supabase, user } = await authenticatedClient();
   if (!(await validateAssociations(supabase, user.id, parsed.data.cardId, parsed.data.offerId))) {
-    return { status: "error", message: "Select an active card and current canonical offer." };
+    return { status: "error", message: "Select an active card and current credit card offer." };
   }
 
   const listingId = randomUUID();
@@ -166,7 +166,7 @@ export async function updateOfferListingAction(listingId: string, _state: FormSt
 
   const { supabase, user } = await authenticatedClient();
   if (!(await validateAssociations(supabase, user.id, parsed.data.cardId, parsed.data.offerId))) {
-    return { status: "error", message: "Select an active card and current canonical offer." };
+    return { status: "error", message: "Select an active card and current credit card offer." };
   }
   const [{ data: currentListing }, { data: currentEvidence }] = await Promise.all([
     supabase.from("offer_listings").select("card_id, offer_id").eq("id", listingId).eq("user_id", user.id).maybeSingle<{ card_id: string; offer_id: string }>(),
@@ -177,7 +177,7 @@ export async function updateOfferListingAction(listingId: string, _state: FormSt
     return { status: "error", message: "A card cannot be changed after evidence is attached. Create a new listing instead.", fieldErrors: { cardId: ["Keep the original card for this evidence record."] } };
   }
   if (currentEvidence && currentListing.offer_id !== parsed.data.offerId) {
-    return { status: "error", message: "The canonical offer cannot change after evidence is attached. Create a new listing instead.", fieldErrors: { offerId: ["Keep the original offer for this evidence record."] } };
+    return { status: "error", message: "The credit card offer cannot change after evidence is attached. Create a new listing instead.", fieldErrors: { offerId: ["Keep the original offer for this evidence record."] } };
   }
 
   const { data: updated, error: updateError } = await supabase.from("offer_listings").update({

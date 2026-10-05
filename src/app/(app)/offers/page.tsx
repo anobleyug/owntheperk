@@ -51,7 +51,7 @@ export default async function OffersPage({
       <PageHeader
         eyebrow="Private owner dashboard"
         title="My offers"
-        description="Manage your cardholder listings around shared canonical offers. These records are not publicly searchable yet."
+        description="Manage your cardholder listings around shared credit card offers. These records are not publicly searchable yet."
         action={
           <div className="flex flex-wrap gap-2">
             <Link href="/offers/cards" className={buttonVariants({ variant: "outline" })}><CreditCard aria-hidden="true" /> My cards</Link>

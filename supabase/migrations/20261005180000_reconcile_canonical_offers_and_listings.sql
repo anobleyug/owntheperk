@@ -1,5 +1,5 @@
 -- Reconcile the original user-owned offer model into:
---   merchants -> canonical offers -> user/card offer listings.
+--   merchants -> credit card offers -> user/card offer listings.
 -- Historical listing UUIDs and evidence object paths are retained.
 
 create type public.canonical_offer_status as enum ('ACTIVE', 'INACTIVE', 'EXPIRED');
@@ -221,7 +221,7 @@ begin
       where evidence.offer_listing_id = old.id
     )
   then
-    raise exception using errcode = '42501', message = 'The canonical offer cannot change after evidence is attached.';
+    raise exception using errcode = '42501', message = 'The credit card offer cannot change after evidence is attached.';
   end if;
   return new;
 end;
@@ -288,7 +288,7 @@ grant all on table public.offers to service_role;
 grant all on table public.offer_listings to service_role;
 grant all on table public.offer_listing_verifications to service_role;
 
-create policy "Authenticated users read canonical offers"
+create policy "Authenticated users read credit card offers"
 on public.offers for select to authenticated
 using (true);
 
@@ -517,6 +517,6 @@ using (
 comment on table public.offers is
   'Shared canonical merchant promotion definitions. Normal users have read-only access.';
 comment on table public.offer_listings is
-  'Owner-private cardholder listings referencing canonical offers; marketplace terms and verification live here.';
+  'Owner-private cardholder listings referencing credit card offers; marketplace terms and verification live here.';
 comment on table public.offer_listing_verifications is
   'Private evidence for a specific user/card offer listing. Never expose in marketplace DTOs.';

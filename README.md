@@ -122,7 +122,7 @@ enable a UI badge based only on a client claim or form submission.
 - Users can edit only their own draft/needs-review listings and cannot set verification
   state, verification timestamps, or active listing state.
 - Submission uses `submit_offer_listing_for_verification`, which requires an active
-  owned card, a current canonical offer, an asking amount, and registered uploaded
+  owned card, a current credit card offer, an asking amount, and registered uploaded
   evidence before transitioning to `PENDING` / `PENDING_VERIFICATION`.
 - `offer-verification-evidence` is a non-public, 5 MB Storage bucket limited to PNG,
   JPEG, WebP, and PDF. Object paths contain only user, listing, and randomized UUIDs.
@@ -130,7 +130,7 @@ enable a UI badge based only on a client claim or form submission.
   caching; raw storage paths and public URLs are not returned to marketplace pages.
 
 The merchant catalog and private bucket are migration-managed, so hosted environments
-need only `npx supabase db push`. Canonical offers must be added later through trusted
+need only `npx supabase db push`. credit card offers must be added later through trusted
 catalog/admin tooling; normal users cannot create them.
 
 ## Phase 4 verification and marketplace boundary
@@ -138,7 +138,7 @@ catalog/admin tooling; normal users cannot create them.
 - `user_roles` is private and database-enforced; normal users cannot promote
   themselves or update listing verification fields.
 - Admin decisions use `review_offer_listing`, which verifies the pending state,
-  private evidence object, canonical offer, merchant, and expiration before publishing.
+  private evidence object, credit card offer, merchant, and expiration before publishing.
 - `marketplace_listings` explicitly whitelists buyer-safe fields and includes only
   active, verified, unexpired listings from active pseudonymous profiles.
 - Marketplace search and `/listings/[id]` query only that sanitized view. Card IDs,

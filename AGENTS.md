@@ -51,7 +51,7 @@ The platform earns revenue through a small fixed fee, such as **$1.99 to unlock 
 
 **# Example**
 
-A canonical offer exists in the shared offer catalog:
+A credit card offer exists in the shared offer catalog:
 
 Adobe  
 Spend $600  
@@ -66,7 +66,7 @@ User A has the offer on one of their cards and creates a marketplace listing ref
 
 `Ask: $500 OBO`
 
-User C may reference the same canonical offer but create a different listing:
+User C may reference the same credit card offer but create a different listing:
 
 `Min Spend: $600`
 
@@ -515,7 +515,7 @@ A user may have multiple credit cards.
 
 A single credit card may contain multiple eligible offers.
 
-However, offers themselves are **shared canonical entities**. Do not create a duplicate canonical offer row for every cardholder who has the same promotion.
+However, offers themselves are **shared canonical entities**. Do not create a duplicate credit card offer row for every cardholder who has the same promotion.
 
 Core relationship:
 
@@ -529,12 +529,12 @@ Offer (shared catalog entity)
 OfferListing
   → belongs to one User
   → optionally references one private CreditCardProfile
-  → references exactly one canonical Offer
+  → references exactly one credit card offer
 ```
 
 Example:
 
-Canonical Offer #101:
+credit card offer #101:
 
 - Merchant: Adobe
 - Spend requirement: $600
@@ -553,7 +553,7 @@ User C / Personal Card:
 - Min Spend: $600
 - Ask: $480 fixed
 
-The buyer should see two marketplace listings, but the database should retain one canonical offer definition.
+The buyer should see two marketplace listings, but the database should retain one credit card offer definition.
 
 This separation is important for:
 
@@ -641,15 +641,15 @@ Example:
 
 **# Offer and Listing Model**
 
-The domain must distinguish between a **canonical Offer** and a **user OfferListing**.
+The domain must distinguish between a **credit card offer** and a **user OfferListing**.
 
-## Canonical Offer
+## credit card offer
 
 `offers` is the shared/core catalog entity describing the underlying promotion.
 
 An offer may be available to many cardholders and may therefore be referenced by many user listings.
 
-Suggested canonical offer fields:
+Suggested credit card offer fields:
 
 - id
 - merchant_id
@@ -678,16 +678,16 @@ Reward Type: STATEMENT_CREDIT
 
 Expiration Date: 2026-12-31
 
-The canonical offer should not contain user-specific pricing or reputation data.
+The credit card offer should not contain user-specific pricing or reputation data.
 
 ## Offer Listing
 
-`offer_listings` represents one cardholder making themselves available around a canonical offer.
+`offer_listings` represents one cardholder making themselves available around a credit card offer.
 
 Each listing belongs to:
 
 - one user
-- one canonical offer
+- one credit card offer
 - zero or one private credit card profile, depending on implementation
 
 A listing must contain buyer-facing marketplace terms.
@@ -711,7 +711,7 @@ Recommended listing fields:
 
 Example listing:
 
-Canonical Offer: Adobe — $250 statement credit after $600
+credit card offer: Adobe — $250 statement credit after $600
 
 Min Spend: 600
 
@@ -723,7 +723,7 @@ Public display:
 
 `Min Spend $600 · Ask $500 OBO`
 
-Another cardholder may reference the same canonical offer and post:
+Another cardholder may reference the same credit card offer and post:
 
 `Min Spend $600 · Ask $475`
 
@@ -745,9 +745,9 @@ Recommended constraints:
 - ask_amount >= 0
 - currency defaults to USD for MVP
 - one user may create multiple listings
-- many users may reference the same canonical offer
+- many users may reference the same credit card offer
 - a listing owner may pause/remove their own listing
-- canonical offer data should not be duplicated simply because another cardholder posts it
+- credit card offer data should not be duplicated simply because another cardholder posts it
 
 ---
 
@@ -755,9 +755,9 @@ Recommended constraints:
 
 For MVP, verification may be manual.
 
-Verification applies to the **cardholder's listing/evidence that they actually have access to the referenced canonical offer**.
+Verification applies to the **cardholder's listing/evidence that they actually have access to the referenced credit card offer**.
 
-The shared canonical offer may already exist in the catalog, but each cardholder listing must independently establish that the user has the claimed offer.
+The shared credit card offer may already exist in the catalog, but each cardholder listing must independently establish that the user has the claimed offer.
 
 User workflow:
 
@@ -765,9 +765,9 @@ Create Listing
 
 → Select Card
 
-→ Search/select Canonical Offer
+→ Search/select credit card offer
 
-→ If the offer does not exist, request/create a candidate canonical offer for review
+→ If the offer does not exist, request/create a candidate credit card offer for review
 
 → Enter Listing Terms
 
@@ -925,8 +925,8 @@ A public marketplace card should clearly separate the underlying offer benefit f
 A public listing may show:
 
 - merchant
-- canonical offer benefit
-- canonical offer spend requirement where useful
+- credit card offer benefit
+- credit card offer spend requirement where useful
 - listing Min Spend
 - listing Ask amount
 - `OBO` indicator when `accepts_best_offer = true`
@@ -1153,12 +1153,12 @@ Users search primarily by merchant.
 
 **# Search and Marketplace Filtering**
 
-Users should primarily search the marketplace by merchant and compare individual `offer_listings` referencing shared canonical offers.
+Users should primarily search the marketplace by merchant and compare individual `offer_listings` referencing shared credit card offers.
 
 Buyer-facing filters should include:
 
 - merchant
-- canonical offer / benefit
+- credit card offer / benefit
 - maximum Min Spend
 - minimum reward amount
 - maximum Ask amount
@@ -1181,13 +1181,13 @@ Sort options should include:
 
 The marketplace query should return sanitized listing DTOs. It must not expose private `card_id`, card nickname, last four digits, evidence paths, or internal verification fields.
 
-Where multiple listings reference the same canonical offer, buyers should still see them as separate marketplace choices because seller reputation, Min Spend, Ask, and OBO status may differ.
+Where multiple listings reference the same credit card offer, buyers should still see them as separate marketplace choices because seller reputation, Min Spend, Ask, and OBO status may differ.
 
 ---
 
 **# Merchant Pages**
 
-A merchant page should aggregate canonical offers and the active user listings referencing them.
+A merchant page should aggregate credit card offers and the active user listings referencing them.
 
 Example:
 
@@ -1197,7 +1197,7 @@ Adobe
 
 17 active verified listings
 
-Canonical offer:
+credit card offer:
 
 `Spend $600 → $250 statement credit`
 
@@ -1823,7 +1823,7 @@ Only conversation participants may normally read.
 
 **## offers**
 
-Shared/canonical offer catalog.
+Shared/credit card offer catalog.
 
 - id
 - merchant_id
@@ -1840,11 +1840,11 @@ Shared/canonical offer catalog.
 - created_at
 - updated_at
 
-One canonical offer may be referenced by many user listings.
+One credit card offer may be referenced by many user listings.
 
 **## offer_listings**
 
-User/cardholder marketplace post referencing a canonical offer.
+User/cardholder marketplace post referencing a credit card offer.
 
 - id
 - user_id
@@ -1871,7 +1871,7 @@ Relationship:
 
 **## offer_listing_verifications**
 
-Private evidence that a particular listing owner has access to the referenced canonical offer.
+Private evidence that a particular listing owner has access to the referenced credit card offer.
 
 - id
 - offer_listing_id
