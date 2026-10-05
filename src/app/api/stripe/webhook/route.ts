@@ -2,6 +2,7 @@ import type Stripe from "stripe";
 import { z } from "zod";
 
 import { getServerEnv } from "@/lib/env/server";
+import { privateNoStoreHeaders } from "@/lib/http-cache";
 import { logServerEvent } from "@/lib/server-logger";
 import { createPrivilegedClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe/server";
@@ -21,7 +22,11 @@ const chatUnlockMetadataSchema = z.object({
 });
 
 function genericError(status: number) {
-  return Response.json({ received: false }, { status, headers: { "Cache-Control": "no-store" } });
+  return Response.json({ received: false }, { status, headers: privateNoStoreHeaders });
+}
+
+function success() {
+  return Response.json({ received: true }, { headers: privateNoStoreHeaders });
 }
 
 export async function POST(request: Request) {
@@ -41,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   if (event.type !== "checkout.session.completed") {
-    return Response.json({ received: true });
+    return success();
   }
 
   const session = event.data.object;
@@ -58,7 +63,7 @@ export async function POST(request: Request) {
     logServerEvent("error", "stripe_webhook_claim_failed", { errorCode: claimError.code ?? "unknown" });
     return genericError(500);
   }
-  if (claim === "PROCESSED") return Response.json({ received: true });
+  if (claim === "PROCESSED") return success();
   if (claim !== "CLAIMED") return genericError(409);
 
   async function finish(succeeded: boolean) {
@@ -122,9 +127,9 @@ export async function POST(request: Request) {
   } else {
     if (!(await finish(true))) return genericError(500);
     logServerEvent("warn", "stripe_payment_type_ignored");
-    return Response.json({ received: true });
+    return success();
   }
 
   if (!(await finish(true))) return genericError(500);
-  return Response.json({ received: true });
+  return success();
 }

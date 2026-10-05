@@ -6,6 +6,7 @@ import type { RewardType } from "@/features/offers/types";
 import type { ConversationDTO, ConversationStatus, MessageDTO } from "./types";
 
 const CONVERSATION_COLUMNS = "id, listing_id, seller_user_id, buyer_user_id, status, merchant_name, offer_title, reward_amount, reward_type, min_spend, ask_amount, is_obo, seller_username, seller_rating_average, updated_at";
+export const CONVERSATIONS_PAGE_SIZE = 20;
 
 type ConversationRow = {
   id: string; listing_id: string; seller_user_id: string; buyer_user_id: string;
@@ -66,9 +67,13 @@ function mapConversation(row: ConversationRow, currentUserId: string, profiles: 
   };
 }
 
-export async function getConversations(supabase: SupabaseClient, currentUserId: string) {
-  const { data, error } = await supabase.from("participant_conversations").select(CONVERSATION_COLUMNS)
-    .neq("status", "LOCKED").order("updated_at", { ascending: false });
+export async function getConversations(supabase: SupabaseClient, currentUserId: string, page = 1) {
+  const from = (page - 1) * CONVERSATIONS_PAGE_SIZE;
+  const { data, error, count } = await supabase.from("participant_conversations")
+    .select(CONVERSATION_COLUMNS, { count: "exact" })
+    .neq("status", "LOCKED")
+    .order("updated_at", { ascending: false })
+    .range(from, from + CONVERSATIONS_PAGE_SIZE - 1);
   if (error) throw new Error("Unable to load conversations.");
   const rows = (data ?? []) as ConversationRow[];
   const profiles = await participantProfiles(supabase, rows);
@@ -79,7 +84,11 @@ export async function getConversations(supabase: SupabaseClient, currentUserId: 
       .in("conversation_id", ids).neq("sender_id", currentUserId).is("read_at", null);
     for (const row of unreadRows ?? []) unread.set(row.conversation_id, (unread.get(row.conversation_id) ?? 0) + 1);
   }
-  return rows.map((row) => mapConversation(row, currentUserId, profiles, unread.get(row.id) ?? 0));
+  return {
+    conversations: rows.map((row) => mapConversation(row, currentUserId, profiles, unread.get(row.id) ?? 0)),
+    total: count ?? 0,
+    pageSize: CONVERSATIONS_PAGE_SIZE,
+  };
 }
 
 export async function getConversation(supabase: SupabaseClient, conversationId: string, currentUserId: string) {

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import { PwaLifecycle } from "@/components/pwa-lifecycle";
+import { QueryProvider } from "@/components/query-provider";
 import { publicEnv } from "@/lib/env/client";
 
 import "./globals.css";
@@ -45,8 +46,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        {children}
-        <PwaLifecycle />
+        <QueryProvider>
+          {children}
+          <PwaLifecycle />
+        </QueryProvider>
       </body>
     </html>
   );

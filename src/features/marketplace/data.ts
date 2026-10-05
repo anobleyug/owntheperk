@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { RewardType } from "@/features/offers/types";
 import { MARKETPLACE_COLUMNS } from "./public-listing-fields";
-import type { MarketplaceFilters, MarketplaceListingDTO } from "./types";
+import type { MarketplaceFilters, MarketplaceListingDTO, MerchantSummaryDTO } from "./types";
 
 const PAGE_SIZE = 12;
 type MarketplaceRow = {
@@ -71,6 +71,16 @@ export async function getMarketplaceListing(supabase: SupabaseClient, listingId:
     .eq("listing_id", listingId).maybeSingle<MarketplaceRow>();
   if (error || !data) return null;
   return mapMarketplaceRow(data);
+}
+
+export async function getActiveMerchantSummaries(supabase: SupabaseClient): Promise<MerchantSummaryDTO[]> {
+  const { data, error } = await supabase.from("merchants")
+    .select("id, name, slug, category")
+    .eq("status", "ACTIVE")
+    .order("name")
+    .limit(200);
+  if (error) throw new Error("Unable to load merchants.");
+  return (data ?? []) as MerchantSummaryDTO[];
 }
 
 export async function recordMarketplaceSearch(supabase: SupabaseClient, query: string) {

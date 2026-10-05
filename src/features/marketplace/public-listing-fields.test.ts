@@ -20,4 +20,15 @@ describe("public marketplace field allowlist", () => {
       "verification_badge",
     ]));
   });
+
+  it("does not expose private listing or verification fields", () => {
+    expect(PUBLIC_MARKETPLACE_FIELDS).not.toEqual(expect.arrayContaining([
+      "user_id",
+      "card_id",
+      "evidence_path",
+      "seller_notes",
+      "reviewer_id",
+      "verification_timestamp",
+    ]));
+  });
 });

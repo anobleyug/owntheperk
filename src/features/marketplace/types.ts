@@ -35,3 +35,16 @@ export type MarketplaceFilters = {
   sort: MarketplaceSort;
   page: number;
 };
+
+export type MarketplaceSearchResultDTO = {
+  listings: MarketplaceListingDTO[];
+  total: number;
+  pageSize: number;
+};
+
+export type MerchantSummaryDTO = {
+  id: string;
+  name: string;
+  slug: string;
+  category: string | null;
+};

@@ -48,7 +48,6 @@ const nextConfig: NextConfig = {
       "/onboarding/:path*",
       "/account-suspended/:path*",
       "/auth/:path*",
-      "/api/:path*",
       "/login/:path*",
       "/signup/:path*",
       "/forgot-password/:path*",
@@ -76,7 +75,10 @@ const nextConfig: NextConfig = {
       },
       ...privateRoutes.map((source) => ({
         source,
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+        ],
       })),
       {
         source: "/sw.js",
