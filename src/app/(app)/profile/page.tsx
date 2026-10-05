@@ -43,9 +43,9 @@ export default async function ProfilePage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Anonymous profile"
+        eyebrow="Your marketplace profile"
         title="Your profile"
-        description="Manage the anonymous profile and reputation details other marketplace members can see after connecting."
+        description="Choose what other members can see after you connect. Your personal details always stay private."
       />
 
       <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
@@ -87,7 +87,7 @@ export default async function ProfilePage() {
               {
                 icon: MessageCircleReply,
                 value: String(profile.completedInteractionCount),
-                label: "Interactions",
+                label: "Connections completed",
               },
               {
                 icon: BadgeCheck,
@@ -109,8 +109,8 @@ export default async function ProfilePage() {
       <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
         <h2 className="text-lg font-semibold">Edit public profile</h2>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          Only these fields are editable. Trust, verification, and reputation fields are
-          protected by database permissions and Row Level Security.
+          You can change the details below. Ratings and verification details are protected
+          and cannot be edited.
         </p>
         <div className="mt-6 max-w-2xl">
           <ProfileForm
@@ -137,10 +137,10 @@ export default async function ProfilePage() {
 
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
-          <h2 className="font-semibold">Private account data</h2>
+          <h2 className="font-semibold">Your privacy</h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Your email and authentication details stay in Supabase Auth and are never
-            included in the marketplace profile DTO.
+            Your email and sign-in details stay private and are never shown on your
+            marketplace profile.
           </p>
         </div>
         <form action={logoutAction}>

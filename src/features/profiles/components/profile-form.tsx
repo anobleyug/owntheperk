@@ -62,7 +62,7 @@ export function ProfileForm({
 
       <div className="space-y-2">
         <label htmlFor="avatarUrl" className="text-sm font-semibold">
-          Avatar URL <span className="font-normal text-muted-foreground">(optional)</span>
+          Profile picture link <span className="font-normal text-muted-foreground">(optional)</span>
         </label>
         <input
           id="avatarUrl"
@@ -76,7 +76,7 @@ export function ProfileForm({
           className={inputClassName}
         />
         <p id="avatar-help" className="text-xs leading-5 text-muted-foreground">
-          Use an HTTPS image URL that does not reveal private information.
+          Paste a secure link to an image that does not reveal personal information.
         </p>
         {state.fieldErrors?.avatarUrl?.[0] ? (
           <p id="avatar-error" className="text-xs font-medium text-red-700">
