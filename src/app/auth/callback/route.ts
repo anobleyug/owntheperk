@@ -1,6 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-
+import { publicEnv } from "@/lib/env/client";
 import { createClient } from "@/lib/supabase/server";
 
 const OTP_TYPES = new Set<EmailOtpType>([
@@ -39,8 +39,8 @@ export async function GET(request: Request) {
   }
 
   if (error) {
-    return NextResponse.redirect(new URL("/login?auth_error=callback", url.origin));
+    return NextResponse.redirect(new URL("/login?auth_error=callback", publicEnv.NEXT_PUBLIC_APP_URL));
   }
 
-  return NextResponse.redirect(new URL(next, url.origin));
+  return NextResponse.redirect(new URL(next, publicEnv.NEXT_PUBLIC_APP_URL));
 }
