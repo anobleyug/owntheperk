@@ -2,130 +2,81 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type {
-  EvidenceStatus,
-  MerchantDTO,
-  OfferCardOptionDTO,
-  OfferListingStatus,
-  OfferVerificationStatus,
-  PrivateOfferDTO,
-  RewardType,
-} from "./types";
+import type { CanonicalOfferDTO, CanonicalOfferStatus, EvidenceStatus, MerchantDTO, OfferCardOptionDTO, OfferListingStatus, OfferVerificationStatus, PrivateOfferListingDTO, RewardType } from "./types";
 
-type OfferRow = {
-  id: string;
-  card_id: string;
-  merchant_id: string;
-  title: string;
-  description: string;
-  spend_requirement: number | string;
-  reward_amount: number | string;
-  reward_type: RewardType;
-  expiration_date: string;
-  verification_status: OfferVerificationStatus;
-  verification_timestamp: string | null;
-  listing_status: OfferListingStatus;
-  created_at: string;
-  updated_at: string;
+type ListingRow = {
+  id: string; offer_id: string; card_id: string; min_spend: number | string;
+  ask_amount: number | string | null; is_obo: boolean; verification_status: OfferVerificationStatus;
+  verification_timestamp: string | null; listing_status: OfferListingStatus; created_at: string; updated_at: string;
 };
-
-type CardRow = {
-  id: string;
-  nickname: string;
-  issuer: string;
-  status: OfferCardOptionDTO["status"];
+type CanonicalOfferRow = {
+  id: string; merchant_id: string; title: string; description: string; required_spend: number | string;
+  reward_amount: number | string; reward_type: RewardType; expiration_date: string; status: CanonicalOfferStatus;
 };
+type CardRow = { id: string; nickname: string; issuer: string; status: OfferCardOptionDTO["status"] };
+type EvidenceRow = { id: string; offer_listing_id: string; status: EvidenceStatus };
 
-type MerchantRow = MerchantDTO;
-type EvidenceRow = { id: string; offer_id: string; status: EvidenceStatus };
+const LISTING_COLUMNS = "id, offer_id, card_id, min_spend, ask_amount, is_obo, verification_status, verification_timestamp, listing_status, created_at, updated_at";
+const OFFER_COLUMNS = "id, merchant_id, title, description, required_spend, reward_amount, reward_type, expiration_date, status";
 
-const OFFER_COLUMNS =
-  "id, card_id, merchant_id, title, description, spend_requirement, reward_amount, reward_type, expiration_date, verification_status, verification_timestamp, listing_status, created_at, updated_at";
+function mapCanonicalOffer(row: CanonicalOfferRow): CanonicalOfferDTO {
+  return { id: row.id, merchantId: row.merchant_id, title: row.title, description: row.description,
+    requiredSpend: Number(row.required_spend), rewardAmount: Number(row.reward_amount), rewardType: row.reward_type,
+    expirationDate: row.expiration_date, status: row.status };
+}
 
-export async function getOfferFormOptions(supabase: SupabaseClient, userId: string) {
-  const [{ data: cards, error: cardError }, { data: merchants, error: merchantError }] =
-    await Promise.all([
-      supabase
-        .from("credit_card_profiles")
-        .select("id, nickname, issuer, status")
-        .eq("user_id", userId)
-        .eq("status", "ACTIVE")
-        .order("nickname"),
-      supabase
-        .from("merchants")
-        .select("id, name, slug, category")
-        .eq("status", "ACTIVE")
-        .order("name"),
-    ]);
-
-  if (cardError || merchantError) throw new Error("Unable to load offer form options.");
-
+export async function getOfferListingFormOptions(supabase: SupabaseClient, userId: string) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [cardsResult, merchantsResult, offersResult] = await Promise.all([
+    supabase.from("credit_card_profiles").select("id, nickname, issuer, status").eq("user_id", userId).eq("status", "ACTIVE").order("nickname"),
+    supabase.from("merchants").select("id, name, slug, category").eq("status", "ACTIVE").order("name"),
+    supabase.from("offers").select(OFFER_COLUMNS).eq("status", "ACTIVE").gte("expiration_date", today).order("expiration_date"),
+  ]);
+  if (cardsResult.error || merchantsResult.error || offersResult.error) throw new Error("Unable to load listing form options.");
   return {
-    cards: (cards ?? []) as OfferCardOptionDTO[],
-    merchants: (merchants ?? []) as MerchantDTO[],
+    cards: (cardsResult.data ?? []) as OfferCardOptionDTO[],
+    merchants: (merchantsResult.data ?? []) as MerchantDTO[],
+    offers: ((offersResult.data ?? []) as CanonicalOfferRow[]).map(mapCanonicalOffer),
   };
 }
 
-export async function getPrivateOffers(
-  supabase: SupabaseClient,
-  userId: string,
-): Promise<PrivateOfferDTO[]> {
-  const [offersResult, cardsResult, merchantsResult, evidenceResult] = await Promise.all([
-    supabase.from("offers").select(OFFER_COLUMNS).eq("user_id", userId).order("created_at", {
-      ascending: false,
-    }),
-    supabase
-      .from("credit_card_profiles")
-      .select("id, nickname, issuer, status")
-      .eq("user_id", userId),
-    supabase.from("merchants").select("id, name, slug, category").eq("status", "ACTIVE"),
-    supabase.from("offer_verifications").select("id, offer_id, status").eq("user_id", userId),
+export async function getPrivateOfferListings(supabase: SupabaseClient, userId: string): Promise<PrivateOfferListingDTO[]> {
+  const [listingsResult, cardsResult, offersResult, merchantsResult, evidenceResult] = await Promise.all([
+    supabase.from("offer_listings").select(LISTING_COLUMNS).eq("user_id", userId).order("created_at", { ascending: false }),
+    supabase.from("credit_card_profiles").select("id, nickname, issuer, status").eq("user_id", userId),
+    supabase.from("offers").select(OFFER_COLUMNS),
+    supabase.from("merchants").select("id, name, slug, category"),
+    supabase.from("offer_listing_verifications").select("id, offer_listing_id, status").eq("user_id", userId),
   ]);
-
-  if (offersResult.error || cardsResult.error || merchantsResult.error || evidenceResult.error) {
-    throw new Error("Unable to load your private offers.");
+  if (listingsResult.error || cardsResult.error || offersResult.error || merchantsResult.error || evidenceResult.error) {
+    throw new Error("Unable to load your private offer listings.");
   }
-
   const cards = new Map(((cardsResult.data ?? []) as CardRow[]).map((row) => [row.id, row]));
-  const merchants = new Map(
-    ((merchantsResult.data ?? []) as MerchantRow[]).map((row) => [row.id, row]),
-  );
-  const evidence = new Map(
-    ((evidenceResult.data ?? []) as EvidenceRow[]).map((row) => [row.offer_id, row]),
-  );
+  const offers = new Map(((offersResult.data ?? []) as CanonicalOfferRow[]).map((row) => [row.id, row]));
+  const merchants = new Map(((merchantsResult.data ?? []) as MerchantDTO[]).map((row) => [row.id, row]));
+  const evidence = new Map(((evidenceResult.data ?? []) as EvidenceRow[]).map((row) => [row.offer_listing_id, row]));
 
-  return ((offersResult.data ?? []) as OfferRow[]).map((offer) => {
-    const card = cards.get(offer.card_id);
+  return ((listingsResult.data ?? []) as ListingRow[]).flatMap((listing) => {
+    const offer = offers.get(listing.offer_id);
+    if (!offer) return [];
+    const card = cards.get(listing.card_id);
     const merchant = merchants.get(offer.merchant_id);
-    const evidenceRow = evidence.get(offer.id);
-    return {
-      id: offer.id,
-      cardId: offer.card_id,
-      merchantId: offer.merchant_id,
-      title: offer.title,
-      description: offer.description,
-      spendRequirement: Number(offer.spend_requirement),
-      rewardAmount: Number(offer.reward_amount),
-      rewardType: offer.reward_type,
-      expirationDate: offer.expiration_date,
-      verificationStatus: offer.verification_status,
-      verificationTimestamp: offer.verification_timestamp,
-      listingStatus: offer.listing_status,
-      createdAt: offer.created_at,
-      updatedAt: offer.updated_at,
-      merchantName: merchant?.name ?? "Unavailable merchant",
-      cardNickname: card?.nickname ?? "Removed card",
-      cardIssuer: card?.issuer ?? "",
+    const evidenceRow = evidence.get(listing.id);
+    return [{
+      id: listing.id, offerId: listing.offer_id, cardId: listing.card_id, merchantId: offer.merchant_id,
+      title: offer.title, description: offer.description, requiredSpend: Number(offer.required_spend),
+      rewardAmount: Number(offer.reward_amount), rewardType: offer.reward_type, expirationDate: offer.expiration_date,
+      minSpend: Number(listing.min_spend), askAmount: listing.ask_amount === null ? null : Number(listing.ask_amount),
+      isObo: listing.is_obo, verificationStatus: listing.verification_status,
+      verificationTimestamp: listing.verification_timestamp, listingStatus: listing.listing_status,
+      createdAt: listing.created_at, updatedAt: listing.updated_at, merchantName: merchant?.name ?? "Unavailable merchant",
+      cardNickname: card?.nickname ?? "Removed card", cardIssuer: card?.issuer ?? "",
       evidence: evidenceRow ? { id: evidenceRow.id, status: evidenceRow.status } : null,
-    };
+    }];
   });
 }
 
-export async function getPrivateOffer(
-  supabase: SupabaseClient,
-  userId: string,
-  offerId: string,
-) {
-  const offers = await getPrivateOffers(supabase, userId);
-  return offers.find((offer) => offer.id === offerId) ?? null;
+export async function getPrivateOfferListing(supabase: SupabaseClient, userId: string, listingId: string) {
+  const listings = await getPrivateOfferListings(supabase, userId);
+  return listings.find((listing) => listing.id === listingId) ?? null;
 }

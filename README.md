@@ -112,23 +112,26 @@ enable a UI badge based only on a client claim or form submission.
 - Route protection is enforced by the session-refresh proxy and rechecked in the
   authenticated server layout.
 
-## Phase 3 private offer boundary
+## Phase 3 offer catalog and private listing boundary
 
 - `credit_card_profiles` is owner-only and stores only organizational data. Full card
   numbers, CVV, PIN, credentials, and banking information are never accepted.
 - Authenticated users can read active merchants but cannot change the merchant catalog.
-- `offers` remains owner-only. Users can edit draft/needs-review terms but cannot set
-  verification state, verification timestamps, or active listing state.
-- Submission uses the constrained `submit_offer_for_verification` database function,
-  which requires an active owned card, active merchant, unexpired offer, and registered
-  uploaded evidence before transitioning to `PENDING` / `PENDING_VERIFICATION`.
+- `offers` is the shared, read-only canonical promotion catalog. `offer_listings`
+  stores owner/card-specific Min Spend, Ask, and OBO terms.
+- Users can edit only their own draft/needs-review listings and cannot set verification
+  state, verification timestamps, or active listing state.
+- Submission uses `submit_offer_listing_for_verification`, which requires an active
+  owned card, a current canonical offer, an asking amount, and registered uploaded
+  evidence before transitioning to `PENDING` / `PENDING_VERIFICATION`.
 - `offer-verification-evidence` is a non-public, 5 MB Storage bucket limited to PNG,
-  JPEG, WebP, and PDF. Object paths contain only user, offer, and randomized UUIDs.
+  JPEG, WebP, and PDF. Object paths contain only user, listing, and randomized UUIDs.
 - Evidence downloads are proxied through an authenticated owner route with `no-store`
   caching; raw storage paths and public URLs are not returned to marketplace pages.
 
-The merchant catalog is inserted by the Phase 3 migration, so hosted environments need
-only `npx supabase db push`. No dashboard SQL or manual bucket creation is required.
+The merchant catalog and private bucket are migration-managed, so hosted environments
+need only `npx supabase db push`. Canonical offers must be added later through trusted
+catalog/admin tooling; normal users cannot create them.
 
 ## Railway
 

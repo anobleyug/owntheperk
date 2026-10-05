@@ -1,35 +1,32 @@
 import { describe, expect, it } from "vitest";
 
-import { offerFormSchema } from "./schema";
+import { offerListingFormSchema } from "./schema";
 
-const futureYear = new Date().getUTCFullYear() + 2;
-const validOffer = {
+const validListing = {
   cardId: "11111111-1111-4111-8111-111111111111",
-  merchantId: "22222222-2222-4222-8222-222222222222",
-  title: "$250 statement credit after $600 spend",
-  description: "Eligible purchases under the displayed issuer terms.",
-  spendRequirement: "600",
-  rewardAmount: "250",
-  rewardType: "STATEMENT_CREDIT",
-  expirationDate: `${futureYear}-12-31`,
+  offerId: "22222222-2222-4222-8222-222222222222",
+  minSpend: "600",
+  askAmount: "500",
+  isObo: "on",
 };
 
-describe("offerFormSchema", () => {
-  it("parses a valid offer and numeric amounts", () => {
-    const parsed = offerFormSchema.parse(validOffer);
-    expect(parsed.spendRequirement).toBe(600);
-    expect(parsed.rewardAmount).toBe(250);
+describe("offerListingFormSchema", () => {
+  it("parses marketplace money and OBO terms", () => {
+    const parsed = offerListingFormSchema.parse(validListing);
+    expect(parsed.minSpend).toBe(600);
+    expect(parsed.askAmount).toBe(500);
+    expect(parsed.isObo).toBe(true);
   });
 
   it.each(["-1", "1.234", "not-money"])("rejects invalid amount %s", (amount) => {
-    expect(
-      offerFormSchema.safeParse({ ...validOffer, spendRequirement: amount }).success,
-    ).toBe(false);
+    expect(offerListingFormSchema.safeParse({ ...validListing, askAmount: amount }).success).toBe(false);
   });
 
-  it("rejects an expired offer", () => {
-    expect(
-      offerFormSchema.safeParse({ ...validOffer, expirationDate: "2020-01-01" }).success,
-    ).toBe(false);
+  it("requires a canonical offer UUID", () => {
+    expect(offerListingFormSchema.safeParse({ ...validListing, offerId: "" }).success).toBe(false);
+  });
+
+  it("treats an unchecked OBO field as false", () => {
+    expect(offerListingFormSchema.parse({ ...validListing, isObo: null }).isObo).toBe(false);
   });
 });

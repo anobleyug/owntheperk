@@ -89,8 +89,8 @@ function CardEditor({ card }: { card: PrivateCardDTO }) {
         if (
           selectedStatus === "REMOVED" &&
           !window.confirm(
-            card.offerCount
-              ? `Remove this private card profile? Its ${card.offerCount} offer record(s) will be preserved.`
+            card.listingCount
+              ? `Remove this private card profile? Its ${card.listingCount} listing record(s) will be preserved.`
               : "Remove this private card profile?",
           )
         ) {
@@ -104,7 +104,7 @@ function CardEditor({ card }: { card: PrivateCardDTO }) {
           <CreditCard aria-hidden="true" className="size-5" />
         </span>
         <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
-          {card.offerCount} {card.offerCount === 1 ? "offer" : "offers"}
+          {card.listingCount} {card.listingCount === 1 ? "listing" : "listings"}
         </span>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">

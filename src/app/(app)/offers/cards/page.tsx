@@ -25,7 +25,7 @@ export default async function CardsPage() {
       <PageHeader
         eyebrow="Owner-only organization"
         title="My private cards"
-        description="Use nicknames to organize offers. Card profiles, types, and optional last four digits are never exposed in marketplace data."
+        description="Use nicknames to organize listings. Card profiles, types, and optional last four digits are never exposed in marketplace data."
       />
 
       <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">

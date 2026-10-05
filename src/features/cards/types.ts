@@ -8,5 +8,5 @@ export type PrivateCardDTO = {
   last4: string | null;
   status: CardStatus;
   createdAt: string;
-  offerCount: number;
+  listingCount: number;
 };

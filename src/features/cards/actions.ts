@@ -77,14 +77,14 @@ export async function updateCardAction(
 
   if (parsed.data.status === "REMOVED") {
     const { count } = await supabase
-      .from("offers")
+      .from("offer_listings")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
       .eq("card_id", cardId);
     if ((count ?? 0) > 0 && formData.get("confirmRemoval") !== "yes") {
       return {
         status: "error",
-        message: "This card has offers. Confirm removal to keep those records intact.",
+        message: "This card has listings. Confirm removal to keep those records intact.",
       };
     }
   }

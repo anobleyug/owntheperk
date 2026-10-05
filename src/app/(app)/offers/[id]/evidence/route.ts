@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
 
 import { EVIDENCE_BUCKET } from "@/features/offers/evidence";
-import { offerIdSchema } from "@/features/offers/schema";
+import { offerListingIdSchema } from "@/features/offers/schema";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  if (!offerIdSchema.safeParse(id).success) return new NextResponse("Not found", { status: 404 });
+  if (!offerListingIdSchema.safeParse(id).success) return new NextResponse("Not found", { status: 404 });
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new NextResponse("Not found", { status: 404 });
 
   const { data: evidence } = await supabase
-    .from("offer_verifications")
+    .from("offer_listing_verifications")
     .select("evidence_path")
-    .eq("offer_id", id)
+    .eq("offer_listing_id", id)
     .eq("user_id", user.id)
     .maybeSingle<{ evidence_path: string }>();
   if (!evidence) return new NextResponse("Not found", { status: 404 });

@@ -5,18 +5,18 @@ import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/ui/button";
-import { createOfferAction } from "@/features/offers/actions";
-import { OfferForm } from "@/features/offers/components/offer-form";
-import { getOfferFormOptions } from "@/features/offers/data";
+import { createOfferListingAction } from "@/features/offers/actions";
+import { OfferListingForm } from "@/features/offers/components/offer-listing-form";
+import { getOfferListingFormOptions } from "@/features/offers/data";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Add offer" };
+export const metadata: Metadata = { title: "Add listing" };
 
 export default async function NewOfferPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  const { cards, merchants } = await getOfferFormOptions(supabase, user.id);
+  const { cards, merchants, offers } = await getOfferListingFormOptions(supabase, user.id);
 
   return (
     <div className="space-y-8">
@@ -25,7 +25,7 @@ export default async function NewOfferPage() {
       </Link>
       <PageHeader
         eyebrow="Private listing setup"
-        title="Add an offer"
+        title="Add a listing"
         description="Save a draft at any time. Submission requires private evidence and always enters pending verification."
       />
 
@@ -33,13 +33,13 @@ export default async function NewOfferPage() {
         <section className="rounded-3xl border border-border bg-card p-6 text-center sm:p-8">
           <CreditCard aria-hidden="true" className="mx-auto size-8 text-primary" />
           <h2 className="mt-4 text-lg font-semibold">Add an active card first</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">Offers must belong to one of your private card profiles.</p>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">Listings must belong to one of your private card profiles.</p>
           <Link href="/offers/cards" className={buttonVariants({ className: "mt-5" })}>Manage private cards</Link>
         </section>
       ) : (
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
           <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
-            <OfferForm action={createOfferAction} cards={cards} merchants={merchants} />
+            <OfferListingForm action={createOfferListingAction} cards={cards} merchants={merchants} offers={offers} />
           </section>
           <aside className="h-fit rounded-3xl bg-brand-ink p-6 text-primary-foreground">
             <FileLock2 aria-hidden="true" className="size-6 text-[#a8d8cb]" />

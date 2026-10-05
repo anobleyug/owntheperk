@@ -7,8 +7,8 @@ import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { getPrivateCards } from "@/features/cards/data";
-import { PrivateOfferCard } from "@/features/offers/components/private-offer-card";
-import { getPrivateOffers } from "@/features/offers/data";
+import { PrivateOfferListingCard } from "@/features/offers/components/private-offer-listing-card";
+import { getPrivateOfferListings } from "@/features/offers/data";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "My offers" };
@@ -24,26 +24,26 @@ export default async function OffersPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [allOffers, cards] = await Promise.all([
-    getPrivateOffers(supabase, user.id),
+  const [allListings, cards] = await Promise.all([
+    getPrivateOfferListings(supabase, user.id),
     getPrivateCards(supabase, user.id),
   ]);
   const requestedStatus = (await searchParams).status ?? "ALL";
   const selectedStatus = FILTERS.includes(requestedStatus as (typeof FILTERS)[number])
     ? requestedStatus
     : "ALL";
-  const offers =
+  const listings =
     selectedStatus === "ALL"
-      ? allOffers
-      : allOffers.filter((offer) => offer.verificationStatus === selectedStatus);
-  const offersByCard = Map.groupBy(offers, (offer) => offer.cardId);
+      ? allListings
+      : allListings.filter((listing) => listing.verificationStatus === selectedStatus);
+  const listingsByCard = Map.groupBy(listings, (listing) => listing.cardId);
   const stats = [
     { icon: CreditCard, label: "Active cards", value: cards.filter((card) => card.status === "ACTIVE").length },
-    { icon: Tags, label: "Total offers", value: allOffers.length },
-    { icon: FilePenLine, label: "Drafts", value: allOffers.filter((offer) => offer.verificationStatus === "DRAFT").length },
-    { icon: Clock3, label: "Pending", value: allOffers.filter((offer) => offer.verificationStatus === "PENDING").length },
-    { icon: FileCheck2, label: "Verified", value: allOffers.filter((offer) => offer.verificationStatus === "VERIFIED").length },
-    { icon: Clock3, label: "Expired", value: allOffers.filter((offer) => offer.verificationStatus === "EXPIRED" || offer.listingStatus === "EXPIRED" || offer.expirationDate < new Date().toISOString().slice(0, 10)).length },
+    { icon: Tags, label: "Total listings", value: allListings.length },
+    { icon: FilePenLine, label: "Drafts", value: allListings.filter((listing) => listing.verificationStatus === "DRAFT").length },
+    { icon: Clock3, label: "Pending", value: allListings.filter((listing) => listing.verificationStatus === "PENDING").length },
+    { icon: FileCheck2, label: "Verified", value: allListings.filter((listing) => listing.verificationStatus === "VERIFIED").length },
+    { icon: Clock3, label: "Expired", value: allListings.filter((listing) => listing.verificationStatus === "EXPIRED" || listing.listingStatus === "EXPIRED" || listing.expirationDate < new Date().toISOString().slice(0, 10)).length },
   ];
 
   return (
@@ -51,11 +51,11 @@ export default async function OffersPage({
       <PageHeader
         eyebrow="Private owner dashboard"
         title="My offers"
-        description="Organize offers by private card profile and track evidence and verification status. These records are not publicly searchable."
+        description="Manage your cardholder listings around shared canonical offers. These records are not publicly searchable yet."
         action={
           <div className="flex flex-wrap gap-2">
             <Link href="/offers/cards" className={buttonVariants({ variant: "outline" })}><CreditCard aria-hidden="true" /> My cards</Link>
-            <Link href="/offers/new" className={buttonVariants()}><CirclePlus aria-hidden="true" /> Add offer</Link>
+            <Link href="/offers/new" className={buttonVariants()}><CirclePlus aria-hidden="true" /> Add listing</Link>
           </div>
         }
       />
@@ -70,11 +70,11 @@ export default async function OffersPage({
         ))}
       </div>
 
-      {allOffers.length ? (
+      {allListings.length ? (
         <section>
           <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-            <h2 className="text-lg font-semibold">All private offers</h2>
+            <h2 className="text-lg font-semibold">All private listings</h2>
             <p className="mt-1 text-sm text-muted-foreground">Card nicknames appear only in this owner-only dashboard.</p>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Filter offers by verification status">
@@ -89,34 +89,34 @@ export default async function OffersPage({
               ))}
             </div>
           </div>
-          {offers.length ? (
+          {listings.length ? (
             <div className="space-y-7">
-              {Array.from(offersByCard.entries()).map(([cardId, cardOffers]) => (
+              {Array.from(listingsByCard.entries()).map(([cardId, cardListings]) => (
                 <section key={cardId} className="space-y-3">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <h3 className="font-semibold">{cardOffers[0]?.cardNickname}</h3>
-                      <p className="text-xs text-muted-foreground">Private card · {cardOffers.length} {cardOffers.length === 1 ? "offer" : "offers"}</p>
+                      <h3 className="font-semibold">{cardListings[0]?.cardNickname}</h3>
+                      <p className="text-xs text-muted-foreground">Private card · {cardListings.length} {cardListings.length === 1 ? "listing" : "listings"}</p>
                     </div>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {cardOffers.map((offer) => <PrivateOfferCard key={offer.id} offer={offer} />)}
+                    {cardListings.map((listing) => <PrivateOfferListingCard key={listing.id} listing={listing} />)}
                   </div>
                 </section>
               ))}
             </div>
           ) : (
-            <p className="rounded-2xl bg-muted p-5 text-sm text-muted-foreground">No offers match this status.</p>
+            <p className="rounded-2xl bg-muted p-5 text-sm text-muted-foreground">No listings match this status.</p>
           )}
         </section>
       ) : (
         <EmptyState
           icon={Tags}
-          title="No offers yet"
-          description={cards.some((card) => card.status === "ACTIVE") ? "Create a draft offer and add private evidence when you are ready to submit it." : "Add a private card profile before creating your first offer."}
+          title="No listings yet"
+          description={cards.some((card) => card.status === "ACTIVE") ? "Create a listing for a shared offer and add private evidence when you are ready to submit it." : "Add a private card profile before creating your first listing."}
           action={
             <Link href={cards.length ? "/offers/new" : "/offers/cards"} className={buttonVariants({ variant: "outline" })}>
-              {cards.length ? "Add offer" : "Add private card"}
+              {cards.length ? "Add listing" : "Add private card"}
             </Link>
           }
         />
