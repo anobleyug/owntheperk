@@ -1,10 +1,6 @@
-Here’s a Codex-ready project context you can paste as the root instruction for the repo.
+# Project Context
 
-
-
-**# Project Context**
-
-Build a **mobile-first responsive web application** for a pseudonymous peer-to-peer marketplace where cardholders can create listings referencing verified merchant-specific credit card offers and connect with buyers interested in those merchants.
+Build a **mobile-first responsive web application** for an anonymous peer-to-peer marketplace where cardholders can create listings referencing verified merchant-specific credit card offers and connect with buyers interested in those merchants.
 
 The product is conceptually similar to **Facebook Marketplace behind a small paywall**, but the marketplace contains user listings tied to a shared catalog of merchant/card offers rather than physical goods.
 
@@ -39,23 +35,26 @@ Its role is limited to:
 - discovery
 - shared offer catalog / normalization
 - user listing verification
-- pseudonymous profiles
+- anonymous marketplace profiles
 - reputation
 - paid chat access
 - peer-to-peer messaging
 - moderation and trust/safety
 
-The platform earns revenue through a small fixed fee, such as **$1.99 to unlock a conversation**.
+The platform earns revenue through two fixed platform fees: **$0.99 to submit a listing for verification** and **$1.99 to unlock a conversation**.
 
 ---
 
-**# Example**
+# Example
 
 A credit card offer exists in the shared offer catalog:
 
-Adobe  
-Spend $600  
-Receive $250 statement credit  
+Adobe
+
+Spend $600
+
+Receive $250 statement credit
+
 Expires December 31
 
 Multiple eligible cardholders may have this exact same offer.
@@ -79,7 +78,7 @@ User B searches for Adobe and sees both listings side-by-side. The buyer can com
 - whether OBO is accepted
 - expiration
 - verification status
-- seller reputation
+- anonymous seller reputation
 
 User B pays $1.99 to unlock chat with the selected cardholder.
 
@@ -89,427 +88,220 @@ The platform does not need to know whether they complete any transaction afterwa
 
 ---
 
-**# Core Product Principle**
-
-
+# Core Product Principle
 
 Always preserve this boundary:
 
-
-
-**\*\*The platform verifies, discovers, and connects. Users independently decide what they do after connecting.\*\***
-
-
+**The platform verifies, discovers, and connects. Users independently decide what they do after connecting.**
 
 Do not design features that make the platform:
 
+- a seller of card offers
+- a transfer mechanism for card rewards
+- an escrow provider
+- a user-to-user payment processor
+- a broker of underlying purchases
+- a guarantor of statement credits
+- a system for sharing card credentials
 
+---
 
-\- a seller of card offers
-
-\- a transfer mechanism for card rewards
-
-\- an escrow provider
-
-\- a user-to-user payment processor
-
-\- a broker of underlying purchases
-
-\- a guarantor of statement credits
-
-\- a system for sharing card credentials
-
-
-
-\---
-
-
-
-**# Recommended Technology Stack**
-
-
+# Recommended Technology Stack
 
 Use:
 
+## Frontend
 
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
 
-**## Frontend**
-
-
-
-\- Next.js
-
-\- React
-
-\- TypeScript
-
-\- Tailwind CSS
-
-\- shadcn/ui
-
-
-
-**## Backend**
-
-
+## Backend
 
 Use Next.js server-side functionality initially:
 
-
-
-\- Server Actions
-
-\- Route Handlers / API routes
-
-
+- Server Actions
+- Route Handlers / API routes
 
 Do not create a separate backend service unless required.
 
-
-
-**## Database**
-
-
+## Database
 
 Use:
 
+- PostgreSQL
+- Supabase
 
-
-\- PostgreSQL
-
-\- Supabase
-
-
-
-**## Authentication**
-
-
+## Authentication
 
 Use:
 
-
-
-\- Supabase Auth
-
-
+- Supabase Auth
 
 Required account verification:
 
-
-
-\- Email verification
-
-\- Phone verification
-
-
+- Email verification
+- Phone verification
 
 Government ID verification is NOT required for MVP.
 
-
-
-**## Realtime Messaging**
-
-
+## Realtime Messaging
 
 Use:
 
+- Supabase Realtime
 
-
-\- Supabase Realtime
-
-
-
-**## Storage**
-
-
+## Storage
 
 Use:
 
-
-
-\- Supabase Storage
-
-
+- Supabase Storage
 
 Verification evidence must be stored privately.
 
-
-
-**## Payments**
-
-
+## Payments
 
 Use:
 
-
-
-\- Stripe
-
-
+- Stripe
 
 For MVP, Stripe should process only platform fees such as:
 
-
-
-\`$1.99 Unlock Chat\`
-
-
+`$1.99 Unlock Chat`
 
 Do not implement user-to-user payments.
 
-
-
-**## Hosting**
+## Hosting
 
 Use:
 
-\- Railway
+- Railway
 
 Configure Next.js for self-hosted Railway deployment, using standalone output when appropriate.
 
-
-
-**## Future Mobile App**
-
-
+## Future Mobile App
 
 If native mobile apps are later required:
 
-
-
-\- Expo
-
-\- React Native
-
-\- TypeScript
-
-
+- Expo
+- React Native
+- TypeScript
 
 The existing Supabase backend should remain reusable.
 
+---
 
+# Application Design
 
-\---
-
-
-
-**# Application Design**
-
-
-
-Build the web app **\*\*mobile-first\*\***.
-
-
+Build the web app **mobile-first**.
 
 The application must work well on:
 
-
-
-\- iPhone
-
-\- Android phones
-
-\- tablets
-
-\- desktop browsers
-
-
+- iPhone
+- Android phones
+- tablets
+- desktop browsers
 
 The first implementation should be a responsive web application.
 
-
-
 It should also be structured so it can operate as a PWA.
 
+---
 
-
-\---
-
-
-
-**# Navigation**
-
-
+# Navigation
 
 Recommended mobile bottom navigation:
 
-
-
-\- Search
-
-\- My Offers
-
-\- Add
-
-\- Messages
-
-\- Profile
-
-
+- Search
+- My Offers
+- Add
+- Messages
+- Profile
 
 Desktop navigation may use:
 
+- top navigation
+- sidebar
+- responsive marketplace layout
 
+---
 
-\- top navigation
+# User Model
 
-\- sidebar
-
-\- responsive marketplace layout
-
-
-
-\---
-
-
-
-**# User Model**
-
-
-
-Users interact publicly through **\*\*pseudonymous usernames\*\***.
-
-
+Users interact publicly through **anonymous usernames**.
 
 Example:
 
-
-
 DealPilot82
-
-
 
 Public profile:
 
-
-
-\- username
-
-\- avatar
-
-\- rating
-
-\- review count
-
-\- completed interactions
-
-\- phone verified badge
-
-\- number of active verified offers
-
-\- optional trust badges
-
-\- join date
-
-\- response rate
-
-
+- username
+- avatar
+- rating
+- review count
+- completed interactions
+- phone verified badge
+- number of active verified offers
+- optional trust badges
+- join date
+- response rate
 
 Do NOT publicly expose:
 
+- legal name
+- email
+- phone number
+- physical address
+- payment information
+- full credit card number
+- last 4 card digits
+- issuer login credentials
+- verification screenshots
+- government ID information
 
+---
 
-\- legal name
-
-\- email
-
-\- phone number
-
-\- physical address
-
-\- payment information
-
-\- full credit card number
-
-\- last 4 card digits
-
-\- issuer login credentials
-
-\- verification screenshots
-
-\- government ID information
-
-
-
-\---
-
-
-
-**# Progressive Verification**
-
-
+# Progressive Verification
 
 Use three conceptual trust levels.
 
-
-
-**## Level 1 — Account Verification**
-
-
+## Level 1 — Account Verification
 
 Required:
 
+- email verified
+- phone verified
+- Terms of Service accepted
+- Privacy Policy accepted
 
-
-\- email verified
-
-\- phone verified
-
-\- Terms of Service accepted
-
-\- Privacy Policy accepted
-
-
-
-**## Level 2 — Offer Verification**
-
-
+## Level 2 — Offer Verification
 
 Required before publishing a listing.
 
-
-
 Verification confirms only that evidence of the offer was provided.
-
-
 
 It does NOT guarantee that a future purchase will qualify.
 
-
-
 Display:
 
-
-
-**\*\*Offer Verified\*\***
-
-
+**Offer Verified**
 
 Recommended disclaimer:
 
-
-
 "Offer verification confirms that evidence of this offer was provided at the time of verification. The platform does not guarantee that any transaction will qualify for the benefit."
 
-
-
-**## Level 3 — Optional Identity Verification**
-
-
+## Level 3 — Optional Identity Verification
 
 Not required for MVP.
 
-
-
 The architecture may support optional identity verification later.
 
+---
 
-
-\---
-
-
-
-**# Multiple Credit Cards and Shared Offers**
+# Multiple Credit Cards and Shared Offers
 
 A user may have multiple credit cards.
 
@@ -520,151 +312,158 @@ However, offers themselves are **shared canonical entities**. Do not create a du
 Core relationship:
 
 ```text
+
 User
-  → many CreditCardProfiles
+
+ → many CreditCardProfiles
 
 Offer (shared catalog entity)
-  → referenced by many OfferListings
+
+ → referenced by many OfferListings
 
 OfferListing
-  → belongs to one User
-  → optionally references one private CreditCardProfile
-  → references exactly one credit card offer
-```
+
+ → belongs to one User
+
+ → optionally references one private CreditCardProfile
+
+ → references exactly one credit card offer
+
+\`\`\`
 
 Example:
 
 credit card offer #101:
 
-- Merchant: Adobe
-- Spend requirement: $600
-- Benefit: $250 statement credit
-- Expiration: Dec 31
+\- Merchant: Adobe
+
+\- Spend requirement: $600
+
+\- Benefit: $250 statement credit
+
+\- Expiration: Dec 31
 
 User A / Business Card:
 
-- references Offer #101
-- Min Spend: $600
-- Ask: $500 OBO
+\- references Offer #101
+
+\- Min Spend: $600
+
+\- Ask: $500 OBO
 
 User C / Personal Card:
 
-- references Offer #101
-- Min Spend: $600
-- Ask: $480 fixed
+\- references Offer #101
+
+\- Min Spend: $600
+
+\- Ask: $480 fixed
 
 The buyer should see two marketplace listings, but the database should retain one credit card offer definition.
 
 This separation is important for:
 
-- deduplicating common offers
-- clean merchant pages
-- consistent offer details
-- buyer filtering
-- analytics
-- future automated offer matching
-- easier verification/admin workflows
+\- deduplicating common offers
 
----
+\- clean merchant pages
 
-**# Credit Card Profile**
+\- consistent offer details
 
+\- buyer filtering
 
+\- analytics
 
-Card profiles are private organizational records.
+\- future automated offer matching
 
-
-
-Suggested fields:
-
-
-
-\- id
-
-\- userId
-
-\- issuer
-
-\- nickname
-
-\- last4Optional
-
-\- cardTypeOptional
-
-\- status
-
-\- createdAt
-
-\- updatedAt
-
-
-
-Never store:
-
-
-
-\- CVV
-
-\- PIN
-
-\- issuer username/password
-
-
-
-For MVP, do NOT store full card numbers.
-
-
-
-Card nicknames are private.
-
-
-
-Example:
-
-
-
-"Business Card"
-
-
-
-"Travel Card"
-
-
-
-"Personal Card"
-
-
+\- easier verification/admin workflows
 
 \---
 
+**\*\*# Credit Card Profile\*\***
 
+Card profiles are private organizational records.
 
-**# Offer and Listing Model**
+Suggested fields:
 
-The domain must distinguish between a **credit card offer** and a **user OfferListing**.
+\\- id
 
-## credit card offer
+\\- userId
 
-`offers` is the shared/core catalog entity describing the underlying promotion.
+\\- issuer
+
+\\- nickname
+
+\\- last4Optional
+
+\\- cardTypeOptional
+
+\\- status
+
+\\- createdAt
+
+\\- updatedAt
+
+Never store:
+
+\\- CVV
+
+\\- PIN
+
+\\- issuer username/password
+
+For MVP, do NOT store full card numbers.
+
+Card nicknames are private.
+
+Example:
+
+"Business Card"
+
+"Travel Card"
+
+"Personal Card"
+
+\\---
+
+**\*\*# Offer and Listing Model\*\***
+
+The domain must distinguish between a **\*\*credit card offer\*\*** and a **\*\*user OfferListing\*\***.
+
+**## credit card offer**
+
+\`offers\` is the shared/core catalog entity describing the underlying promotion.
 
 An offer may be available to many cardholders and may therefore be referenced by many user listings.
 
 Suggested credit card offer fields:
 
-- id
-- merchant_id
-- issuer_optional
-- card_product_optional
-- title
-- description
-- spend_requirement
-- reward_amount
-- reward_type
-- expiration_date
-- terms_summary_optional
-- status
-- created_at
-- updated_at
+\- id
+
+\- merchant_id
+
+\- issuer_optional
+
+\- card_product_optional
+
+\- title
+
+\- description
+
+\- spend_requirement
+
+\- reward_amount
+
+\- reward_type
+
+\- expiration_date
+
+\- terms_summary_optional
+
+\- status
+
+\- created_at
+
+\- updated_at
 
 Example:
 
@@ -680,34 +479,49 @@ Expiration Date: 2026-12-31
 
 The credit card offer should not contain user-specific pricing or reputation data.
 
-## Offer Listing
+**## Offer Listing**
 
-`offer_listings` represents one cardholder making themselves available around a credit card offer.
+\`offer_listings\` represents one cardholder making themselves available around a credit card offer.
 
 Each listing belongs to:
 
-- one user
-- one credit card offer
-- zero or one private credit card profile, depending on implementation
+\- one user
+
+\- one credit card offer
+
+\- zero or one private credit card profile, depending on implementation
 
 A listing must contain buyer-facing marketplace terms.
 
 Recommended listing fields:
 
-- id
-- user_id
-- offer_id
-- card_id
-- min_spend
-- ask_amount
-- accepts_best_offer
-- currency
-- seller_notes_optional
-- verification_status
-- verification_timestamp
-- listing_status
-- created_at
-- updated_at
+\- id
+
+\- user_id
+
+\- offer_id
+
+\- card_id
+
+\- min_spend
+
+\- ask_amount
+
+\- accepts_best_offer
+
+\- currency
+
+\- seller_notes_optional
+
+\- verification_status
+
+\- verification_timestamp
+
+\- listing_status
+
+\- created_at
+
+\- updated_at
 
 Example listing:
 
@@ -721,41 +535,47 @@ Accepts Best Offer: true
 
 Public display:
 
-`Min Spend $600 · Ask $500 OBO`
+\`Min Spend $600 · Ask $500 OBO\`
 
 Another cardholder may reference the same credit card offer and post:
 
-`Min Spend $600 · Ask $475`
+\`Min Spend $600 · Ask $475\`
 
-## Marketplace Pricing Semantics
+**## Marketplace Pricing Semantics**
 
-`min_spend` is the marketplace listing's minimum spend requirement shown to buyers.
+\`min_spend\` is the marketplace listing's minimum spend requirement shown to buyers.
 
-`ask_amount` is what the listing owner is asking in connection with that listing.
+\`ask_amount\` is what the listing owner is asking in connection with that listing.
 
-`accepts_best_offer = true` means the UI displays the ask as negotiable, for example:
+\`accepts_best_offer = true\` means the UI displays the ask as negotiable, for example:
 
-`$500 OBO`
+\`$500 OBO\`
 
 Do not interpret or enforce the downstream arrangement between users. These values are listing/discovery information used to help users compare and filter marketplace posts.
 
 Recommended constraints:
 
-- min_spend >= 0
-- ask_amount >= 0
-- currency defaults to USD for MVP
-- one user may create multiple listings
-- many users may reference the same credit card offer
-- a listing owner may pause/remove their own listing
-- credit card offer data should not be duplicated simply because another cardholder posts it
+\- min_spend >= 0
 
----
+\- ask_amount >= 0
 
-**# Offer / Listing Verification**
+\- currency defaults to USD for MVP
+
+\- one user may create multiple listings
+
+\- many users may reference the same credit card offer
+
+\- a listing owner may pause/remove their own listing
+
+\- credit card offer data should not be duplicated simply because another cardholder posts it
+
+\---
+
+**\*\*# Offer / Listing Verification\*\***
 
 For MVP, verification may be manual.
 
-Verification applies to the **cardholder's listing/evidence that they actually have access to the referenced credit card offer**.
+Verification applies to the **\*\*cardholder's listing/evidence that they actually have access to the referenced credit card offer\*\***.
 
 The shared credit card offer may already exist in the catalog, but each cardholder listing must independently establish that the user has the claimed offer.
 
@@ -789,154 +609,139 @@ Create Listing
 
 Listing verification statuses:
 
-- PENDING
-- VERIFIED
-- REJECTED
-- NEEDS_REVIEW
-- EXPIRED
+\- PENDING
+
+\- VERIFIED
+
+\- REJECTED
+
+\- NEEDS_REVIEW
+
+\- EXPIRED
 
 Listing statuses:
 
-- DRAFT
-- PENDING_VERIFICATION
-- ACTIVE
-- PAUSED
-- EXPIRED
-- REMOVED
+\- DRAFT
+
+\- PENDING_VERIFICATION
+
+\- ACTIVE
+
+\- PAUSED
+
+\- EXPIRED
+
+\- REMOVED
 
 Verification confirms only that evidence showed the cardholder had access to the referenced offer at the time of review.
 
 It does not guarantee that a future purchase will qualify.
 
----
+\---
 
-**# Verification Evidence**
-
-
+**\*\*# Verification Evidence\*\***
 
 Verification evidence is sensitive private information.
 
-
-
 Possible evidence:
 
+\\- screenshot
 
+\\- uploaded image
 
-\- screenshot
-
-\- uploaded image
-
-\- uploaded document
-
-
+\\- uploaded document
 
 Store evidence in private Supabase Storage buckets.
 
-
-
 Never expose raw evidence publicly.
-
-
 
 Use:
 
+\\- private buckets
 
+\\- signed URLs
 
-\- private buckets
+\\- short expiration times
 
-\- signed URLs
+\\- role-based access
 
-\- short expiration times
-
-\- role-based access
-
-\- authorization checks
-
-
+\\- authorization checks
 
 Only:
 
+\\- offer owner
 
-
-\- offer owner
-
-\- authorized moderators/admins
-
-
+\\- authorized moderators/admins
 
 should be able to access verification evidence when required.
 
+\\---
 
-
-\---
-
-
-
-**# Critical Privacy Requirement**
-
-
+**\*\*# Critical Privacy Requirement\*\***
 
 This is a hard architectural requirement.
 
-
-
-**\*\*Public marketplace data should contain the minimum information necessary for users to evaluate an offer and another user's reputation. Cardholder-identifying information and verification evidence must remain private and must never be exposed through public listings, profiles, URLs, metadata, or search indexing.\*\***
-
-
+**\*\*\\\*\\\*Public marketplace data should contain the minimum information necessary for users to evaluate an offer and another user's reputation. Cardholder-identifying information and verification evidence must remain private and must never be exposed through public listings, profiles, URLs, metadata, or search indexing.\\\*\\\*\*\***
 
 This applies to:
 
+\\- frontend components
 
+\\- API responses
 
-\- frontend components
+\\- URLs
 
-\- API responses
+\\- HTML metadata
 
-\- URLs
+\\- Open Graph metadata
 
-\- HTML metadata
+\\- page source
 
-\- Open Graph metadata
+\\- analytics
 
-\- page source
+\\- logs
 
-\- analytics
+\\- search engine indexing
 
-\- logs
+\\- sitemap generation
 
-\- search engine indexing
+\\- public storage
 
-\- sitemap generation
+\\- browser-visible identifiers
 
-\- public storage
+\\---
 
-\- browser-visible identifiers
-
-
-
-\---
-
-
-
-**# Public Marketplace Listing Information**
+**\*\*# Public Marketplace Listing Information\*\***
 
 A public marketplace card should clearly separate the underlying offer benefit from the cardholder's listing terms.
 
 A public listing may show:
 
-- merchant
-- credit card offer benefit
-- credit card offer spend requirement where useful
-- listing Min Spend
-- listing Ask amount
-- `OBO` indicator when `accepts_best_offer = true`
-- expiration
-- Offer/Listing Verified badge
-- pseudonymous username
-- user rating
-- interaction count
-- response rate
-- trust badges
+\- merchant
+
+\- credit card offer benefit
+
+\- credit card offer spend requirement where useful
+
+\- listing Min Spend
+
+\- listing Ask amount
+
+\- \`OBO\` indicator when \`accepts_best_offer = true\`
+
+\- expiration
+
+\- Offer/Listing Verified badge
+
+\- anonymous marketplace username
+
+\- user rating
+
+\- interaction count
+
+\- response rate
+
+\- trust badges
 
 Example:
 
@@ -944,248 +749,226 @@ Adobe
 
 $250 statement credit
 
-Min Spend: $600  
+Min Spend: $600
+
 Ask: $500 OBO
 
 Expires Dec 31
 
 Offer Verified
 
-DealPilot82  
-4.9 stars  
+Anonymous seller
+
+4.9 stars
+
 31 interactions
 
 Unlock Chat — $1.99
 
 The buyer should be able to understand the important economics of a listing without opening the detail page.
 
+\---
+
+**\*\*# Seller Identity Visibility\*\***
+
+Before chat unlock, marketplace cards, search results, merchant pages, and listing-detail pages must NOT show:
+
+- seller username
+- seller avatar/photo
+- direct seller profile link
+- any other stable public identifier that makes the seller recognizable across listings
+
+Before unlock, buyers may see only seller trust/reputation signals, for example:
+
+- 4.9 stars
+- 31 reviews
+- 42 completed interactions
+- response rate
+- Phone Verified / Offer Verified badges
+
+After the buyer successfully pays the $1.99 chat-unlock fee, the conversation may reveal the seller's **anonymous marketplace username and avatar**. Legal identity remains private at all times.
+
 ---
 
-**# Do Not Publicly Display**
-
-
+**\*\*# Do Not Publicly Display\*\***
 
 Never expose:
 
+\\- legal name
 
+\\- email
 
-\- legal name
+\\- phone
 
-\- email
+\\- cardholder name
 
-\- phone
+\\- last 4 digits
 
-\- cardholder name
+\\- full card number
 
-\- last 4 digits
+\\- expiration date of the credit card
 
-\- full card number
+\\- CVV
 
-\- expiration date of the credit card
+\\- private card nickname
 
-\- CVV
+\\- issuer account number
 
-\- private card nickname
+\\- membership ID
 
-\- issuer account number
+\\- issuer login credentials
 
-\- membership ID
+\\- uploaded verification evidence
 
-\- issuer login credentials
+\\- raw file metadata
 
-\- uploaded verification evidence
-
-\- raw file metadata
-
-\- internal financial identifiers
-
-
+\\- internal financial identifiers
 
 The exact card product should also remain private by default.
 
-
-
 Issuer visibility should be optional and should not be required for the core marketplace.
 
+\\---
 
-
-\---
-
-
-
-**# Public IDs**
-
-
+**\*\*# Public IDs\*\***
 
 Use opaque random IDs.
 
-
-
 Prefer:
 
+\\- UUID
 
-
-\- UUID
-
-\- ULID
-
-
+\\- ULID
 
 Do NOT derive IDs from:
 
+\\- username
 
+\\- email
 
-\- username
+\\- phone
 
-\- email
+\\- card number
 
-\- phone
+\\- legal name
 
-\- card number
-
-\- legal name
-
-\- issuer identifiers
-
-
+\\- issuer identifiers
 
 Good:
 
-
-
-\`/offers/01J8W9R9QG3F7C4E1D\`
-
-
+\\\`/offers/01J8W9R9QG3F7C4E1D\\\`
 
 Bad:
 
+\\\`/john-smith/amex-4821/adobe\\\`
 
+\\---
 
-\`/john-smith/amex-4821/adobe\`
-
-
-
-\---
-
-
-
-**# Search Engine Privacy**
-
-
+**\*\*# Search Engine Privacy\*\***
 
 Marketing pages may be indexed.
 
-
-
 Marketplace user profiles and detailed offer pages should generally:
 
+\\- require authentication
 
+\\- use noindex where appropriate
 
-\- require authentication
-
-\- use noindex where appropriate
-
-\- not appear in public sitemap files
-
-
+\\- not appear in public sitemap files
 
 Do not expose identifying data to search engines.
 
+\\---
 
-
-\---
-
-
-
-**# Merchant Model**
-
-
+**\*\*# Merchant Model\*\***
 
 Create a Merchant table.
 
-
-
 Fields:
 
+\\- id
 
+\\- name
 
-\- id
+\\- slug
 
-\- name
+\\- logoUrl
 
-\- slug
+\\- category
 
-\- logoUrl
+\\- createdAt
 
-\- category
-
-\- createdAt
-
-\- updatedAt
-
-
+\\- updatedAt
 
 Examples:
 
+Adobe
 
+Dell
 
-Adobe &#x20;
+Nike
 
-Dell &#x20;
+Best Buy
 
-Nike &#x20;
-
-Best Buy &#x20;
-
-Samsung &#x20;
+Samsung
 
 Marriott
 
-
-
 Users search primarily by merchant.
 
+\\---
 
+**\*\*# Search and Marketplace Filtering\*\***
 
-\---
-
-
-
-**# Search and Marketplace Filtering**
-
-Users should primarily search the marketplace by merchant and compare individual `offer_listings` referencing shared credit card offers.
+Users should primarily search the marketplace by merchant and compare individual \`offer_listings\` referencing shared credit card offers.
 
 Buyer-facing filters should include:
 
-- merchant
-- credit card offer / benefit
-- maximum Min Spend
-- minimum reward amount
-- maximum Ask amount
-- OBO accepted only
-- expiration
-- seller rating
-- verified listings only
-- recently active sellers
-- recently posted listings
+\- merchant
+
+\- credit card offer / benefit
+
+\- maximum Min Spend
+
+\- minimum reward amount
+
+\- maximum Ask amount
+
+\- OBO accepted only
+
+\- expiration
+
+\- seller rating
+
+\- verified listings only
+
+\- recently active sellers
+
+\- recently posted listings
 
 Sort options should include:
 
-- lowest Ask
-- lowest Min Spend
-- highest reward
-- best effective value where safely derivable
-- newest
-- expiring soon
-- highest rated user
+\- lowest Ask
 
-The marketplace query should return sanitized listing DTOs. It must not expose private `card_id`, card nickname, last four digits, evidence paths, or internal verification fields.
+\- lowest Min Spend
 
-Where multiple listings reference the same credit card offer, buyers should still see them as separate marketplace choices because seller reputation, Min Spend, Ask, and OBO status may differ.
+\- highest reward
 
----
+\- best effective value where safely derivable
 
-**# Merchant Pages**
+\- newest
+
+\- expiring soon
+
+\- highest rated user
+
+The marketplace query should return sanitized listing DTOs. It must not expose private \`card_id\`, card nickname, last four digits, evidence paths, or internal verification fields.
+
+Where multiple listings reference the same credit card offer, buyers should still see them as separate marketplace choices because anonymous seller reputation, Min Spend, Ask, and OBO status may differ.
+
+\---
+
+**\*\*# Merchant Pages\*\***
 
 A merchant page should aggregate credit card offers and the active user listings referencing them.
 
@@ -1199,12 +982,13 @@ Adobe
 
 credit card offer:
 
-`Spend $600 → $250 statement credit`
+\`Spend $600 → $250 statement credit\`
 
 Listings:
 
-- DealPilot82 — Min Spend $600 — Ask $500 OBO — 4.9 stars
-- SaverHawk14 — Min Spend $600 — Ask $475 — 4.8 stars
+\- Anonymous seller — Min Spend $600 — Ask $500 OBO — 4.9 stars
+
+\- Anonymous seller — Min Spend $600 — Ask $475 — 4.8 stars
 
 This structure allows the buyer to understand that multiple cardholders have the same underlying offer while comparing each cardholder's marketplace terms.
 
@@ -1218,689 +1002,480 @@ Notify me when a new Adobe listing is posted.
 
 Do not build advanced alerting for MVP unless easy.
 
----
-
-**# Paid Chat**
-
-
-
-Primary monetization:
-
-
-
-**\*\*Unlock Chat — $1.99\*\***
-
-
-
-For MVP:
-
-
-
-Person B pays $1.99 to unlock a conversation with Person A.
-
-
-
-The platform fee is for access to communication.
-
-
-
-It is NOT:
-
-
-
-\- a brokerage percentage
-
-\- transaction commission
-
-\- success fee
-
-\- escrow fee
-
-
-
 \---
 
+**\*\*# Paid Listing Submission\*\***
 
-
-**# Stripe Payment Flow**
-
-
+Creating a new marketplace listing requires a **$0.99 platform fee** before the listing can be submitted for verification.
 
 Recommended flow:
 
+Create Listing
+→ Select Card / Offer
+→ Enter Min Spend / Ask / OBO
+→ Upload Evidence
+→ Pay $0.99 Listing Fee
+→ Submit for Verification
+→ Admin Review
+→ Publish if Verified
 
+Rules:
+
+- The $0.99 fee is a platform listing/submission fee, not a commission on any downstream arrangement.
+- Do not charge again merely because the owner edits the same draft before submission.
+- Payment success must be verified server-side through Stripe/webhook logic.
+- A listing must not advance to verification submission until the required listing fee is successfully recorded.
+- Future relisting/renewal fees are out of scope unless explicitly added later.
+
+---
+
+**\*\*# Paid Chat\*\***
+
+Primary monetization:
+
+**\*\*\\\*\\\*Unlock Chat — $1.99\\\*\\\*\*\***
+
+For MVP:
+
+Person B pays $1.99 to unlock a conversation with Person A.
+
+The platform fee is for access to communication.
+
+It is NOT:
+
+\\- a brokerage percentage
+
+\\- transaction commission
+
+\\- success fee
+
+\\- escrow fee
+
+\\---
+
+**\*\*# Stripe Payment Flow\*\***
+
+Recommended flow:
 
 User clicks:
 
-
-
 Unlock Chat — $1.99
-
-
 
 → Create Stripe Checkout Session
 
-
-
 → User completes payment
-
-
 
 → Stripe webhook verifies payment
 
-
-
 → Create/update conversation access record
-
-
 
 → Conversation becomes unlocked
 
-
-
 → Users can message each other
-
-
 
 Never trust client-side payment state.
 
-
-
 Always validate payment server-side through Stripe webhooks.
 
+\\---
 
-
-\---
-
-
-
-**# Conversation Model**
+**\*\*# Conversation Model\*\***
 
 A conversation belongs to:
 
-- one `offer_listing`
-- User A / listing owner
-- User B / interested user
+\- one \`offer_listing\`
+
+\- User A / listing owner
+
+\- User B / interested user
 
 Suggested statuses:
 
-- LOCKED
-- ACTIVE
-- COMPLETED
-- NO_AGREEMENT
-- CLOSED
-- REPORTED
+\- LOCKED
+
+\- ACTIVE
+
+\- COMPLETED
+
+\- NO_AGREEMENT
+
+\- CLOSED
+
+\- REPORTED
 
 The conversation should retain the listing context that existed when chat was unlocked, including at minimum:
 
-- offer/listing ID
-- merchant
-- Min Spend
-- Ask amount
-- OBO status
+\- offer/listing ID
+
+\- merchant
+
+\- Min Spend
+
+\- Ask amount
+
+\- OBO status
 
 This prevents confusion if the seller later edits or pauses the listing.
 
 Only conversation participants may normally access messages.
 
----
+After successful $1.99 unlock, conversation participants may see each other's anonymous marketplace username/avatar as designed. Pre-unlock marketplace views must keep those identifiers hidden.
 
-**# Messaging**
+\---
 
-
+**\*\*# Messaging\*\***
 
 Required:
 
+\\- send text messages
 
+\\- receive messages in realtime
 
-\- send text messages
+\\- conversation history
 
-\- receive messages in realtime
+\\- timestamps
 
-\- conversation history
+\\- read state
 
-\- timestamps
+\\- block user
 
-\- read state
+\\- report user
 
-\- block user
-
-\- report user
-
-\- listing reference
-
-
+\\- listing reference
 
 Use Supabase Realtime.
 
-
-
 Do not expose private messages publicly.
 
+\\---
 
-
-\---
-
-
-
-**# Sensitive Message Detection**
-
-
+**\*\*# Sensitive Message Detection\*\***
 
 Warn or block users from sending obvious sensitive credentials such as:
 
+\\- full credit card numbers
 
+\\- CVV
 
-\- full credit card numbers
+\\- passwords
 
-\- CVV
+\\- Social Security numbers
 
-\- passwords
+\\- issuer login credentials
 
-\- Social Security numbers
-
-\- issuer login credentials
-
-\- bank account credentials
-
-
+\\- bank account credentials
 
 Implement basic server-side checks.
 
-
-
 Do not rely exclusively on client-side validation.
 
+\\---
 
-
-\---
-
-
-
-**# Reputation System**
-
-
+**\*\*# Reputation System\*\***
 
 After an interaction, users may rate each other.
 
-
-
 Suggested fields:
 
+\\- overall score
 
+\\- communication score
 
-\- overall score
+\\- reliability score
 
-\- communication score
+\\- listing accuracy score
 
-\- reliability score
-
-\- listing accuracy score
-
-\- optional review text
-
-
+\\- optional review text
 
 Ratings should be linked to real conversations.
 
-
-
 Do not allow arbitrary users to review each other.
 
+\\---
 
-
-\---
-
-
-
-**# Trust Badges**
-
-
+**\*\*# Trust Badges\*\***
 
 Possible badges:
 
+\\- Phone Verified
 
+\\- Offer Verified
 
-\- Phone Verified
+\\- Identity Verified
 
-\- Offer Verified
+\\- 10+ Interactions
 
-\- Identity Verified
+\\- 50+ Interactions
 
-\- 10+ Interactions
-
-\- 50+ Interactions
-
-\- Highly Rated
-
-
+\\- Highly Rated
 
 Never use issuer endorsement-style wording.
 
-
-
 Do not display:
 
+\\- Amex Approved
 
+\\- Chase Approved
 
-\- Amex Approved
-
-\- Chase Approved
-
-\- Citi Verified Seller
-
-
+\\- Citi Verified Seller
 
 unless officially authorized.
 
+\\---
 
-
-\---
-
-
-
-**# Reporting**
-
-
+**\*\*# Reporting\*\***
 
 Users must be able to report:
 
+\\- fake offer
 
+\\- scam attempt
 
-\- fake offer
+\\- harassment
 
-\- scam attempt
+\\- spam
 
-\- harassment
+\\- fake profile
 
-\- spam
+\\- suspicious financial request
 
-\- fake profile
+\\- credential request
 
-\- suspicious financial request
+\\- stolen card behavior
 
-\- credential request
+\\- misleading listing
 
-\- stolen card behavior
+\\---
 
-\- misleading listing
-
-
-
-\---
-
-
-
-**# Admin Dashboard**
-
-
+**\*\*# Admin Dashboard\*\***
 
 Admins need:
 
+**\*\*## User Management\*\***
 
+\\- username
 
-**## User Management**
+\\- email
 
+\\- phone verification status
 
+\\- account status
 
-\- username
+\\- risk status
 
-\- email
+\\- ratings
 
-\- phone verification status
+\\- active listings
 
-\- account status
+\\- reports
 
-\- risk status
+**\*\*## Offer Verification\*\***
 
-\- ratings
+\\- offer details
 
-\- active listings
+\\- evidence
 
-\- reports
+\\- verification status
 
+\\- approve
 
+\\- reject
 
-**## Offer Verification**
+\\- request review
 
+**\*\*## Moderation\*\***
 
+\\- reports
 
-\- offer details
+\\- flagged messages
 
-\- evidence
+\\- suspended accounts
 
-\- verification status
+\\- removed listings
 
-\- approve
+**\*\*## Analytics\*\***
 
-\- reject
+\\- total users
 
-\- request review
+\\- active users
 
+\\- listings
 
+\\- verified offers
 
-**## Moderation**
+\\- top merchants
 
+\\- searches
 
+\\- chat unlocks
 
-\- reports
+\\- revenue
 
-\- flagged messages
+\\- conversion rate
 
-\- suspended accounts
+\\- repeat users
 
-\- removed listings
+\\---
 
-
-
-**## Analytics**
-
-
-
-\- total users
-
-\- active users
-
-\- listings
-
-\- verified offers
-
-\- top merchants
-
-\- searches
-
-\- chat unlocks
-
-\- revenue
-
-\- conversion rate
-
-\- repeat users
-
-
-
-\---
-
-
-
-**# Role Model**
-
-
+**\*\*# Role Model\*\***
 
 At minimum:
 
+\\- USER
 
+\\- MODERATOR
 
-\- USER
-
-\- MODERATOR
-
-\- ADMIN
-
-
+\\- ADMIN
 
 Use role-based authorization.
 
-
-
 Never rely on frontend checks for authorization.
 
+\\---
 
-
-\---
-
-
-
-**# Database Security**
-
-
+**\*\*# Database Security\*\***
 
 Supabase Row Level Security is mandatory.
 
-
-
 Use RLS policies to enforce access.
-
-
 
 Examples:
 
-
-
-**## Public Marketplace Data**
-
-
+**\*\*## Public Marketplace Data\*\***
 
 Authenticated users may read sanitized active offer views.
 
-
-
-**## Credit Card Profiles**
-
-
+**\*\*## Credit Card Profiles\*\***
 
 Only the card owner may read/write.
 
-
-
-**## Verification Evidence**
-
-
+**\*\*## Verification Evidence\*\***
 
 Only:
 
+\\- owner
 
+\\- moderator
 
-\- owner
-
-\- moderator
-
-\- admin
-
-
+\\- admin
 
 may access.
 
-
-
-**## Conversations**
-
-
+**\*\*## Conversations\*\***
 
 Only:
 
+\\- User A
 
+\\- User B
 
-\- User A
-
-\- User B
-
-\- authorized moderators when required for an active report
-
-
+\\- authorized moderators when required for an active report
 
 may access.
 
-
-
-**## Messages**
-
-
+**\*\*## Messages\*\***
 
 Only conversation participants may normally read.
 
+\\---
 
+**\*\*# Recommended Database Model\*\***
 
-\---
+**\*\*## users\*\***
 
+\\- id
 
+\\- username
 
-**# Recommended Database Model**
+\\- email
 
+\\- email_verified
 
+\\- phone
 
-**## users**
+\\- phone_verified
 
+\\- avatar_url
 
+\\- rating_average
 
-\- id
+\\- rating_count
 
-\- username
+\\- completed_interaction_count
 
-\- email
+\\- response_rate
 
-\- email_verified
+\\- optional_identity_verified
 
-\- phone
+\\- account_status
 
-\- phone_verified
+\\- risk_status
 
-\- avatar_url
+\\- created_at
 
-\- rating_average
+\\- updated_at
 
-\- rating_count
+**\*\*## credit_card_profiles\*\***
 
-\- completed_interaction_count
+\\- id
 
-\- response_rate
+\\- user_id
 
-\- optional_identity_verified
+\\- issuer
 
-\- account_status
+\\- nickname
 
-\- risk_status
+\\- last4_optional
 
-\- created_at
+\\- card_type_optional
 
-\- updated_at
+\\- status
 
+\\- created_at
 
+\\- updated_at
 
-**## credit_card_profiles**
+**\*\*## merchants\*\***
 
+\\- id
 
+\\- name
 
-\- id
+\\- slug
 
-\- user_id
+\\- logo_url
 
-\- issuer
+\\- category
 
-\- nickname
+\\- created_at
 
-\- last4_optional
+\\- updated_at
 
-\- card_type_optional
-
-\- status
-
-\- created_at
-
-\- updated_at
-
-
-
-**## merchants**
-
-
-
-\- id
-
-\- name
-
-\- slug
-
-\- logo_url
-
-\- category
-
-\- created_at
-
-\- updated_at
-
-
-
-**## offers**
+**\*\*## offers\*\***
 
 Shared/credit card offer catalog.
 
-- id
-- merchant_id
-- issuer_optional
-- card_product_optional
-- title
-- description
-- spend_requirement
-- reward_amount
-- reward_type
-- expiration_date
-- terms_summary_optional
-- status
-- created_at
-- updated_at
-
-One credit card offer may be referenced by many user listings.
-
-**## offer_listings**
-
-User/cardholder marketplace post referencing a credit card offer.
-
-- id
-- user_id
-- offer_id
-- card_id
-- min_spend
-- ask_amount
-- accepts_best_offer
-- currency
-- seller_notes_optional
-- verification_status
-- verification_timestamp
-- listing_status
-- created_at
-- updated_at
-
-Relationship:
-
-`offers 1 → many offer_listings`
-
-`users 1 → many offer_listings`
-
-`credit_card_profiles 1 → many offer_listings`
-
-**## offer_listing_verifications**
-
-Private evidence that a particular listing owner has access to the referenced credit card offer.
-
-- id
-- offer_listing_id
-- card_id
-- evidence_path
-- extracted_merchant
-- extracted_spend_requirement
-- extracted_reward
-- extracted_expiration
-- reviewer_id
-- status
-- created_at
-- updated_at
-
----
-
-**## conversations**
-
-
-
 \- id
 
-\- listing_id
+\- merchant_id
 
-\- user_a_id
+\- issuer_optional
 
-\- user_b_id
+\- card_product_optional
 
-\- unlock_status
+\- title
+
+\- description
+
+\- spend_requirement
+
+\- reward_amount
+
+\- reward_type
+
+\- expiration_date
+
+\- terms_summary_optional
 
 \- status
 
@@ -1908,670 +1483,552 @@ Private evidence that a particular listing owner has access to the referenced cr
 
 \- updated_at
 
+One credit card offer may be referenced by many user listings.
 
+**\*\*## offer_listings\*\***
 
-**## messages**
-
-
-
-\- id
-
-\- conversation_id
-
-\- sender_id
-
-\- content
-
-\- moderation_status
-
-\- created_at
-
-\- read_at
-
-
-
-**## ratings**
-
-
-
-\- id
-
-\- conversation_id
-
-\- reviewer_id
-
-\- reviewed_user_id
-
-\- overall_score
-
-\- communication_score
-
-\- reliability_score
-
-\- accuracy_score
-
-\- review_text
-
-\- created_at
-
-
-
-**## platform_payments**
-
-
+User/cardholder marketplace post referencing a credit card offer.
 
 \- id
 
 \- user_id
 
-\- conversation_id
+\- offer_id
 
-\- amount
+\- card_id
+
+\- min_spend
+
+\- ask_amount
+
+\- accepts_best_offer
 
 \- currency
 
-\- payment_provider
+\- seller_notes_optional
 
-\- payment_provider_transaction_id
+\- verification_status
 
-\- status
+\- verification_timestamp
+
+\- listing_status
 
 \- created_at
 
+\- updated_at
 
+Relationship:
 
-**## reports**
+\`offers 1 → many offer_listings\`
 
+\`users 1 → many offer_listings\`
 
+\`credit_card_profiles 1 → many offer_listings\`
+
+**\*\*## offer_listing_verifications\*\***
+
+Private evidence that a particular listing owner has access to the referenced credit card offer.
 
 \- id
 
-\- reporter_id
+\- offer_listing_id
 
-\- reported_user_id
+\- card_id
 
-\- conversation_id
+\- evidence_path
 
-\- offer_id
+\- extracted_merchant
 
-\- reason
+\- extracted_spend_requirement
 
-\- description
+\- extracted_reward
+
+\- extracted_expiration
+
+\- reviewer_id
 
 \- status
 
 \- created_at
 
-\- resolved_at
-
-
+\- updated_at
 
 \---
 
+**\*\*## conversations\*\***
 
+\\- id
 
-**# MVP Scope**
+\\- listing_id
 
+\\- user_a_id
 
+\\- user_b_id
+
+\\- unlock_status
+
+\\- status
+
+\\- created_at
+
+\\- updated_at
+
+**\*\*## messages\*\***
+
+\\- id
+
+\\- conversation_id
+
+\\- sender_id
+
+\\- content
+
+\\- moderation_status
+
+\\- created_at
+
+\\- read_at
+
+**\*\*## ratings\*\***
+
+\\- id
+
+\\- conversation_id
+
+\\- reviewer_id
+
+\\- reviewed_user_id
+
+\\- overall_score
+
+\\- communication_score
+
+\\- reliability_score
+
+\\- accuracy_score
+
+\\- review_text
+
+\\- created_at
+
+**\*\*## platform_payments\*\***
+
+\\- id
+
+\\- user_id
+
+\\- conversation_id
+
+\\- amount
+
+\\- currency
+
+\\- payment_provider
+
+\\- payment_provider_transaction_id
+
+\\- status
+
+\\- created_at
+
+**\*\*## reports\*\***
+
+\\- id
+
+\\- reporter_id
+
+\\- reported_user_id
+
+\\- conversation_id
+
+\\- offer_id
+
+\\- reason
+
+\\- description
+
+\\- status
+
+\\- created_at
+
+\\- resolved_at
+
+\\---
+
+**\*\*# MVP Scope\*\***
 
 Build only the following initially:
 
+1\\. Landing page
 
+2\\. Account registration
 
-1\. Landing page
+3\\. Email verification
 
-2\. Account registration
+4\\. Phone verification
 
-3\. Email verification
+5\\. Anonymous profile creation
 
-4\. Phone verification
+6\\. Login/logout
 
-5\. Pseudonymous profile creation
+7\\. User dashboard
 
-6\. Login/logout
+8\\. Add multiple credit card profiles
 
-7\. User dashboard
+9\\. Add multiple offers per card
 
-8\. Add multiple credit card profiles
+10\\. Merchant database
 
-9\. Add multiple offers per card
+11\\. Merchant search
 
-10\. Merchant database
+12\\. Create listing
 
-11\. Merchant search
+13\\. Upload offer evidence
 
-12\. Create listing
+14\\. Admin verification
 
-13\. Upload offer evidence
+15\\. Publish verified offer
 
-14\. Admin verification
+16\\. View marketplace listings
 
-15\. Publish verified offer
+17\\. View anonymous user reputation
 
-16\. View marketplace listings
+18\\. Stripe $1.99 chat unlock
 
-17\. View pseudonymous user reputation
+19\\. Private realtime chat
 
-18\. Stripe $1.99 chat unlock
+20\\. Mark interaction completed
 
-19\. Private realtime chat
+21\\. Peer ratings
 
-20\. Mark interaction completed
+22\\. Block user
 
-21\. Peer ratings
+23\\. Report user
 
-22\. Block user
+24\\. Automatic offer expiration
 
-23\. Report user
+25\\. Admin dashboard
 
-24\. Automatic offer expiration
+26\\. Basic marketplace analytics
 
-25\. Admin dashboard
+\\---
 
-26\. Basic marketplace analytics
-
-
-
-\---
-
-
-
-**# Explicitly Out of Scope for MVP**
-
-
+**\*\*# Explicitly Out of Scope for MVP\*\***
 
 Do not build:
 
+\\- mandatory government ID verification
 
+\\- bank account linking
 
-\- mandatory government ID verification
+\\- direct issuer integrations
 
-\- bank account linking
+\\- issuer scraping
 
-\- direct issuer integrations
+\\- user-to-user payments
 
-\- issuer scraping
+\\- escrow
 
-\- user-to-user payments
+\\- wallet functionality
 
-\- escrow
+\\- merchant payment processing
 
-\- wallet functionality
+\\- cashback settlement
 
-\- merchant payment processing
+\\- crypto
 
-\- cashback settlement
+\\- complex recommendation engines
 
-\- crypto
+\\- AI-based matching
 
-\- complex recommendation engines
+\\- native iOS application
 
-\- AI-based matching
+\\- native Android application
 
-\- native iOS application
+\\---
 
-\- native Android application
-
-
-
-\---
-
-
-
-**# Mobile UX**
-
-
+**\*\*# Mobile UX\*\***
 
 Prioritize mobile usability.
 
-
-
 Use:
 
+\\- large touch targets
 
+\\- bottom navigation
 
-\- large touch targets
+\\- full-width cards
 
-\- bottom navigation
+\\- sticky primary actions
 
-\- full-width cards
+\\- responsive dialogs/drawers
 
-\- sticky primary actions
+\\- minimal text density
 
-\- responsive dialogs/drawers
-
-\- minimal text density
-
-\- clear reputation indicators
-
-
+\\- clear reputation indicators
 
 Primary mobile flow:
 
-
-
 Search
-
-
 
 → Merchant
 
-
-
 → Offer Listing
-
-
 
 → User Reputation
 
-
-
 → Unlock Chat
-
-
 
 → Message
 
-
-
 → Complete Interaction
-
-
 
 → Rate User
 
+\\---
 
-
-\---
-
-
-
-**# Cardholder UX**
-
-
+**\*\*# Cardholder UX\*\***
 
 Cardholder flow:
 
-
-
 Dashboard
-
-
 
 → My Cards
 
-
-
 → Add Card
-
-
 
 → Add Offer
 
-
-
 → Upload Evidence
-
-
 
 → Pending Verification
 
-
-
 → Verified
-
-
 
 → Listing Active
 
-
-
 → Receive Chat Request
 
-
-
 → Communicate
-
-
 
 → Complete Interaction
 
-
-
 → Receive Rating
 
+\\---
 
-
-\---
-
-
-
-**# Buyer UX**
-
-
+**\*\*# Buyer UX\*\***
 
 Buyer flow:
 
-
-
 Search Merchant
-
-
 
 → Browse Verified Offers
 
-
-
-→ Compare Reputation
-
-
+→ Compare anonymous reputation
 
 → Select Listing
 
-
-
 → Pay $1.99
-
-
 
 → Unlock Chat
 
-
-
 → Communicate
-
-
 
 → Mark Interaction Complete
 
-
-
 → Rate User
 
+\\---
 
-
-\---
-
-
-
-**# Code Quality Requirements**
-
-
+**\*\*# Code Quality Requirements\*\***
 
 Use:
 
+\\- TypeScript strict mode
 
+\\- reusable components
 
-\- TypeScript strict mode
+\\- clear domain separation
 
-\- reusable components
+\\- server-side authorization
 
-\- clear domain separation
+\\- schema validation
 
-\- server-side authorization
+\\- structured error handling
 
-\- schema validation
+\\- consistent naming
 
-\- structured error handling
+\\- accessible UI
 
-\- consistent naming
-
-\- accessible UI
-
-\- responsive layouts
-
-
+\\- responsive layouts
 
 Prefer:
 
+\\- Zod for validation
 
+\\- React Hook Form where appropriate
 
-\- Zod for validation
-
-\- React Hook Form where appropriate
-
-\- server-side validation for all mutations
-
-
+\\- server-side validation for all mutations
 
 Do not trust frontend input.
 
+\\---
 
-
-\---
-
-
-
-**# Security Requirements**
-
-
+**\*\*# Security Requirements\*\***
 
 Implement:
 
+\\- HTTPS only
 
+\\- Supabase RLS
 
-\- HTTPS only
+\\- role-based authorization
 
-\- Supabase RLS
+\\- private storage buckets
 
-\- role-based authorization
+\\- signed URLs
 
-\- private storage buckets
+\\- rate limiting where appropriate
 
-\- signed URLs
+\\- server-side input validation
 
-\- rate limiting where appropriate
+\\- XSS-safe rendering
 
-\- server-side input validation
+\\- CSRF-safe patterns
 
-\- XSS-safe rendering
+\\- secure Stripe webhooks
 
-\- CSRF-safe patterns
+\\- audit logs for admin actions
 
-\- secure Stripe webhooks
+\\- session revocation
 
-\- audit logs for admin actions
-
-\- session revocation
-
-\- account suspension
-
-
+\\- account suspension
 
 Do not store unnecessary financial information.
 
+\\---
 
-
-\---
-
-
-
-**# Privacy Requirements**
-
-
+**\*\*# Privacy Requirements\*\***
 
 Public marketplace data should contain only what is necessary to evaluate:
 
+\\- an offer
 
-
-\- an offer
-
-\- a pseudonymous user's reputation
-
-
+\\- an anonymous user's reputation
 
 Cardholder-identifying information must remain private.
 
-
-
 Verification evidence must remain private.
-
-
 
 Do not leak sensitive data through:
 
+\\- public APIs
 
+\\- URLs
 
-\- public APIs
+\\- query strings
 
-\- URLs
+\\- analytics
 
-\- query strings
+\\- logs
 
-\- analytics
+\\- metadata
 
-\- logs
+\\- image URLs
 
-\- metadata
+\\- search indexes
 
-\- image URLs
+\\- sitemap files
 
-\- search indexes
+\\- frontend state exposed unnecessarily to the browser
 
-\- sitemap files
+\\---
 
-\- frontend state exposed unnecessarily to the browser
-
-
-
-\---
-
-
-
-**# Architecture Principle**
-
-
+**\*\*# Architecture Principle\*\***
 
 Separate data into:
 
-
-
-**## Public Marketplace Data**
-
-
+**\*\*## Public Marketplace Data\*\***
 
 Safe for authenticated marketplace display.
 
-
-
-**## Private User Data**
-
-
+**\*\*## Private User Data\*\***
 
 Visible only to account owner.
 
-
-
-**## Sensitive Verification Data**
-
-
+**\*\*## Sensitive Verification Data\*\***
 
 Visible only to authorized roles.
 
-
-
 Do not return full database rows directly to the frontend.
-
-
 
 Create explicit DTOs / response models for public data.
 
-
-
 Example:
 
-
-
-\`PublicOfferDTO\`
-
-
+\\\`PublicOfferDTO\\\`
 
 should intentionally contain only fields safe for marketplace display.
 
+\\---
 
-
-\---
-
-
-
-**# Product Positioning**
-
-
+**\*\*# Product Positioning\*\***
 
 Describe the platform as:
 
-
-
-**\*\*A pseudonymous peer-to-peer discovery marketplace for verified merchant-specific card offers.\*\***
-
-
+**\*\*\\\*\\\*An anonymous peer-to-peer discovery marketplace for verified merchant-specific card offers.\\\*\\\*\*\***
 
 The central promise is:
 
+**\*\*\\\*\\\*Find relevant merchant offers, compare anonymous reputation, connect privately after unlock, and decide who you trust.\\\*\\\*\*\***
 
+\\---
 
-**\*\*Find people with relevant merchant offers, verify that the offer exists, connect privately, and use reputation to decide who you trust.\*\***
-
-
-
-\---
-
-
-
-**# Development Strategy**
-
-
+**\*\*# Development Strategy\*\***
 
 Build incrementally.
 
-
-
 Recommended order:
 
+1\\. Project foundation
 
+2\\. Database schema
 
-1\. Project foundation
+3\\. Supabase Auth
 
-2\. Database schema
+4\\. RLS policies
 
-3\. Supabase Auth
+5\\. Anonymous user profiles
 
-4\. RLS policies
+6\\. Merchant model
 
-5\. Pseudonymous user profiles
+7\\. Credit card profile management
 
-6\. Merchant model
+8\\. Offer creation
 
-7\. Credit card profile management
+9\\. Private evidence upload
 
-8\. Offer creation
+10\\. Admin offer verification
 
-9\. Private evidence upload
+11\\. Marketplace search
 
-10\. Admin offer verification
+12\\. Listing details
 
-11\. Marketplace search
+13\\. Stripe payment
 
-12\. Listing details
+14\\. Conversation unlock
 
-13\. Stripe payment
+15\\. Realtime messaging
 
-14\. Conversation unlock
+16\\. Ratings
 
-15\. Realtime messaging
+17\\. Reports
 
-16\. Ratings
+18\\. Admin moderation
 
-17\. Reports
-
-18\. Admin moderation
-
-19\. Mobile/PWA polish
-
-
+19\\. Mobile/PWA polish
 
 Do not attempt to implement every future feature at once.
-
-
 
 Before generating large amounts of code, inspect the existing repository and reuse existing architecture, components, conventions, and dependencies whenever appropriate.

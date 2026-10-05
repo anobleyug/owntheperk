@@ -66,7 +66,7 @@ export function OfferListingForm({ action, cards, merchants, offers, listing }: 
       </div>
     </div>
 
-    <label className="space-y-2 text-sm font-semibold">credit card offer
+    <label className="space-y-2 text-sm font-semibold">Credit Card Offer
       <select key={merchantId} name="offerId" required defaultValue={selectedOfferId} className={inputClass}>
         <option value="" disabled>{merchantId ? "Select an offer" : "Select a merchant first"}</option>
         {visibleOffers.map((offer) => <option key={offer.id} value={offer.id}>{offer.title} · expires {offer.expirationDate}</option>)}
