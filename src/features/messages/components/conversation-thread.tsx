@@ -72,6 +72,7 @@ export function ConversationThread({
     return result;
   }, initialState);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -120,8 +121,8 @@ export function ConversationThread({
   }, [displayMessages]);
 
   return (
-    <section className="flex min-h-[55svh] flex-col rounded-3xl border border-border bg-card">
-      <div className="flex-1 space-y-3 overflow-y-auto p-4 sm:p-6" aria-live="polite">
+    <section className="flex min-h-[calc(100svh-15rem)] flex-col overflow-hidden rounded-3xl border border-border bg-card lg:min-h-[60svh]">
+      <div className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 sm:p-6" aria-live="polite" aria-label="Conversation messages">
         {displayMessages.length === 0 ? (
           <div className="grid min-h-64 place-items-center text-center">
             <div><p className="font-semibold">Start the conversation</p>
@@ -139,7 +140,7 @@ export function ConversationThread({
         <div ref={bottomRef} />
       </div>
 
-      {canSend ? <form action={action} className="sticky bottom-20 border-t border-border bg-card p-3 sm:p-4 lg:bottom-0">
+      {canSend ? <form ref={formRef} action={action} className="chat-composer sticky border-t border-border bg-card p-3 sm:p-4">
         <input type="hidden" name="conversationId" value={conversationId} />
         <div className="flex items-end gap-2">
           <label htmlFor="message-content" className="sr-only">Message</label>
@@ -148,9 +149,17 @@ export function ConversationThread({
             name="content"
             value={content}
             onChange={(event) => setContent(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                if (!pending && content.trim()) formRef.current?.requestSubmit();
+              }
+            }}
             rows={1}
             maxLength={2000}
             placeholder="Write a message…"
+            enterKeyHint="send"
+            aria-describedby="message-safety-note"
             className="min-h-12 flex-1 resize-none rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
           <Button type="submit" size="icon" disabled={pending || !content.trim()} aria-label="Send message">
@@ -158,7 +167,7 @@ export function ConversationThread({
           </Button>
         </div>
         {state.status === "error" && <p role="alert" className="mt-2 text-xs font-medium text-red-700">{state.message}</p>}
-        <p className="mt-2 text-[11px] text-muted-foreground">Never share card numbers, CVVs, passwords, SSNs, or bank credentials.</p>
+        <p id="message-safety-note" className="mt-2 text-[11px] text-muted-foreground">Never share card numbers, CVVs, passwords, SSNs, or bank credentials.</p>
       </form> : <div className="border-t border-border bg-muted/45 p-4 text-center text-sm text-muted-foreground">This conversation is no longer accepting new messages.</div>}
     </section>
   );

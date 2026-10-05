@@ -12,7 +12,7 @@ function Action({ reportId, operation, label, icon: Icon, disabled = false }: {
   disabled?: boolean;
 }) {
   const action = moderateReportAction.bind(null, reportId, operation);
-  return <form action={action}><Button type="submit" variant="outline" size="sm" disabled={disabled}><Icon aria-hidden="true" /> {label}</Button></form>;
+  return <form action={action} className="min-[420px]:w-auto"><Button type="submit" variant="outline" size="sm" className="w-full min-[420px]:w-auto" disabled={disabled}><Icon aria-hidden="true" /> {label}</Button></form>;
 }
 
 export function ReportCard({ report }: { report: AdminReportDTO }) {
@@ -26,7 +26,7 @@ export function ReportCard({ report }: { report: AdminReportDTO }) {
       <div><dt className="text-xs text-muted-foreground">Safe context</dt><dd className="mt-1 font-medium">{report.contextMerchantName ? `${report.contextMerchantName} · ${report.contextOfferTitle ?? "Listing"}` : "Conversation context only"}</dd></div>
       <div><dt className="text-xs text-muted-foreground">Reported account</dt><dd className="mt-1 font-medium">{report.reportedAccountStatus.toLowerCase()}</dd></div>
     </dl>
-    <div className="mt-5 flex flex-wrap gap-2">
+    <div className="mt-5 grid gap-2 min-[420px]:flex min-[420px]:flex-wrap">
       <Action reportId={report.id} operation="REVIEWING" label="Mark reviewing" icon={Eye} />
       <Action reportId={report.id} operation="RESOLVED" label="Resolve" icon={CheckCircle2} />
       <Action reportId={report.id} operation="DISMISSED" label="Dismiss" icon={XCircle} />

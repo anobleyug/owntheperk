@@ -10,6 +10,19 @@ const nextConfig: NextConfig = {
     },
   },
   async headers() {
+    const privateRoutes = [
+      "/search/:path*",
+      "/listings/:path*",
+      "/offers/:path*",
+      "/messages/:path*",
+      "/profile/:path*",
+      "/users/:path*",
+      "/notifications/:path*",
+      "/admin/:path*",
+      "/onboarding/:path*",
+      "/account-suspended/:path*",
+    ];
+
     return [
       {
         source: "/:path*",
@@ -21,6 +34,17 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+        ],
+      },
+      ...privateRoutes.map((source) => ({
+        source,
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+      })),
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" },
         ],
       },
     ];

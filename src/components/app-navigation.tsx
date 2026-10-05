@@ -79,7 +79,7 @@ export function MobileNavigation() {
   return (
     <nav
       aria-label="Primary navigation"
-      className="safe-bottom fixed inset-x-0 bottom-0 z-50 border-t border-border/80 bg-background/94 px-2 pt-1.5 backdrop-blur-xl lg:hidden"
+      className="safe-bottom fixed inset-x-0 bottom-0 z-50 border-t border-border/80 bg-background/94 px-2 pt-1.5 shadow-[0_-8px_30px_-22px_rgba(16,48,51,0.5)] backdrop-blur-xl lg:hidden"
     >
       <div className="mx-auto grid max-w-lg grid-cols-5">
         {navigationItems.map(({ href, icon: Icon, label }) => {
@@ -91,7 +91,7 @@ export function MobileNavigation() {
               href={href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "flex min-h-13 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 active ? "text-primary" : "text-muted-foreground",
               )}
             >

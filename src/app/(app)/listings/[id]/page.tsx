@@ -63,12 +63,8 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
 
     <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
       <div className="flex items-center gap-3">
-        {listing.sellerAvatarUrl ? (
-          // User-configured HTTPS avatars are intentionally rendered without a host allowlist.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={listing.sellerAvatarUrl} alt="" className="size-12 rounded-full object-cover" referrerPolicy="no-referrer" />
-        ) : <span className="grid size-12 place-items-center rounded-full bg-brand-ink text-primary-foreground"><UserRound aria-hidden="true" className="size-5" /></span>}
-        <div><Link href={`/users/${listing.sellerUserId}`} className="font-semibold hover:text-primary">{listing.sellerUsername}</Link>
+        <span className="grid size-12 place-items-center rounded-full bg-brand-ink text-primary-foreground"><UserRound aria-hidden="true" className="size-5" /></span>
+        <div><p className="font-semibold">Anonymous seller</p>
           <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground"><span className="inline-flex items-center gap-1"><Star aria-hidden="true" className="size-3.5 fill-current text-[#b98224]" /> {listing.sellerRatingAverage.toFixed(1)} ({listing.sellerRatingCount})</span><span className="inline-flex items-center gap-1"><MessageCircle aria-hidden="true" className="size-3.5" /> {listing.sellerCompletedInteractionCount} interactions</span></p>
         </div>
       </div>
@@ -76,7 +72,7 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
 
     {!isOwner && <SafetyActions targetUserId={listing.sellerUserId} offerListingId={listing.listingId} initiallyBlocked={hasBlocked} />}
 
-    <section className="sticky bottom-20 rounded-3xl border border-border bg-background/95 p-4 shadow-lg backdrop-blur lg:bottom-4">
+    <section className="sticky-mobile-action sticky z-20 rounded-3xl border border-border bg-background/95 p-4 shadow-lg backdrop-blur lg:bottom-4">
       {isOwner ? <Button type="button" size="lg" className="w-full" disabled>Your Listing</Button>
         : unlocked ? <Button asChild size="lg" className="w-full"><Link href={`/messages/${conversation.id}`}>Open Conversation</Link></Button>
           : hasBlocked ? <Button type="button" size="lg" className="w-full" disabled>Chat unavailable</Button>

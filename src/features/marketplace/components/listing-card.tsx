@@ -5,7 +5,7 @@ import { formatExpiration, formatMoney, formatReward } from "@/features/marketpl
 import type { MarketplaceListingDTO } from "@/features/marketplace/types";
 
 export function ListingCard({ listing }: { listing: MarketplaceListingDTO }) {
-  return <Link href={"/listings/" + listing.listingId} className="block rounded-3xl border border-border bg-card p-5 shadow-[0_18px_55px_-44px_rgba(16,48,51,0.6)] transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
+  return <Link href={"/listings/" + listing.listingId} className="block min-w-0 rounded-3xl border border-border bg-card p-4 shadow-[0_18px_55px_-44px_rgba(16,48,51,0.6)] transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:p-5">
     <div className="flex items-start justify-between gap-4">
       <div><p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{listing.merchantName}</p>
         <h3 className="mt-2 text-lg font-semibold leading-6">{formatReward(listing)}</h3>
@@ -21,9 +21,9 @@ export function ListingCard({ listing }: { listing: MarketplaceListingDTO }) {
       <span className="inline-flex items-center gap-1 font-semibold text-primary"><BadgeCheck aria-hidden="true" className="size-4" /> Offer verified</span>
       <span className="inline-flex items-center gap-1 text-muted-foreground"><CalendarDays aria-hidden="true" className="size-3.5" /> Expires {formatExpiration(listing.expirationDate)}</span>
     </div>
-    <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4 text-sm">
-      <span className="truncate font-semibold">{listing.sellerUsername}</span>
-      <span className="inline-flex shrink-0 items-center gap-1 text-muted-foreground"><Star aria-hidden="true" className="size-4 fill-current text-[#b98224]" /> {listing.sellerRatingCount ? listing.sellerRatingAverage.toFixed(1) : "New"} <span className="text-xs">· {listing.sellerRatingCount} reviews · {listing.sellerCompletedInteractionCount} completed</span></span>
+    <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4 text-sm min-[390px]:flex-row min-[390px]:items-center min-[390px]:justify-between">
+      <span className="font-semibold">Anonymous seller</span>
+      <span className="inline-flex items-center gap-1 text-muted-foreground"><Star aria-hidden="true" className="size-4 shrink-0 fill-current text-[#b98224]" /> {listing.sellerRatingCount ? listing.sellerRatingAverage.toFixed(1) : "New"} <span className="text-xs">· {listing.sellerRatingCount} reviews · {listing.sellerCompletedInteractionCount} completed</span></span>
     </div>
   </Link>;
 }

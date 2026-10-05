@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/page-header";
+import { InstallAppButton } from "@/components/install-app-button";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/features/auth/actions";
 import { updateProfileAction } from "@/features/profiles/actions";
@@ -122,6 +123,16 @@ export default async function ProfilePage() {
             submitLabel="Save profile"
           />
         </div>
+      </section>
+
+      <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div>
+          <h2 className="font-semibold">Install Own the Perk</h2>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Add the app to your home screen for quick access and a focused app view.
+          </p>
+        </div>
+        <InstallAppButton />
       </section>
 
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">

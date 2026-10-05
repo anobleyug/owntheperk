@@ -38,7 +38,7 @@ export function AppShell({
       </aside>
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/70 bg-background/90 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+        <header className="app-topbar sticky top-0 z-30 flex items-center justify-between border-b border-border/70 bg-background/90 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <Brand compact href="/search" className="lg:hidden" />
           <div className="hidden lg:block">
             <p className="text-xs font-semibold text-muted-foreground">Marketplace</p>
@@ -75,7 +75,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl px-4 pt-7 pb-28 sm:px-6 sm:pt-9 lg:px-10 lg:pb-12">
+        <main className="app-content mx-auto w-full max-w-6xl px-4 pt-7 sm:px-6 sm:pt-9 lg:px-10">
           {children}
         </main>
       </div>

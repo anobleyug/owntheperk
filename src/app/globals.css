@@ -66,11 +66,23 @@
 
   body {
     @apply min-h-svh bg-background text-foreground antialiased;
+    overscroll-behavior-y: none;
   }
 
   button,
   a {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, 16px);
   }
 }
 
@@ -81,6 +93,45 @@
 
 .safe-bottom {
   padding-bottom: max(0.55rem, env(safe-area-inset-bottom));
+}
+
+.app-topbar {
+  min-height: calc(4rem + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+}
+
+.app-content {
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+}
+
+.sticky-mobile-action {
+  bottom: calc(4.5rem + env(safe-area-inset-bottom));
+}
+
+.chat-composer {
+  bottom: calc(4.25rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 1024px) {
+  .app-content {
+    padding-bottom: 3rem;
+  }
+
+  .sticky-mobile-action,
+  .chat-composer {
+    bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .paper-grid {

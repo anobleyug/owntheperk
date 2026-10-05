@@ -33,7 +33,7 @@ export function VerificationCard({ verification }: { verification: AdminVerifica
     </div>
     <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
       <div><p className="text-sm font-semibold">{verification.sellerUsername}</p><p className="mt-1 text-xs text-muted-foreground">Evidence status: {verification.evidenceStatus.toLowerCase().replaceAll("_", " ")}</p></div>
-      <Link href={"/admin/verifications/" + verification.listingId + "/evidence"} target="_blank" rel="noreferrer" className={buttonVariants({ variant: "outline" })}><FileLock2 aria-hidden="true" /> View private evidence</Link>
+      <Link href={"/admin/verifications/" + verification.listingId + "/evidence"} target="_blank" rel="noreferrer" className={buttonVariants({ variant: "outline", className: "w-full sm:w-auto" })}><FileLock2 aria-hidden="true" /> View private evidence</Link>
     </div>
     <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap">
       <ReviewButton listingId={verification.listingId} decision="APPROVE" variant="default"><BadgeCheck aria-hidden="true" /> Approve and publish</ReviewButton>

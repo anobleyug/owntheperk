@@ -5,7 +5,18 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/search", "/listings", "/offers", "/messages", "/profile", "/admin"],
+      disallow: [
+        "/search",
+        "/listings",
+        "/offers",
+        "/messages",
+        "/profile",
+        "/users",
+        "/notifications",
+        "/admin",
+        "/onboarding",
+        "/account-suspended",
+      ],
     },
   };
 }
