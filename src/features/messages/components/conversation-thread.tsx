@@ -2,7 +2,7 @@
 
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { Send } from "lucide-react";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useOptimistic, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/browser";
@@ -21,6 +21,8 @@ type MessageRow = {
   read_at: string | null;
 };
 
+type DisplayMessage = MessageDTO & { optimistic?: boolean };
+
 function messageTime(value: string) {
   return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date(value));
 }
@@ -38,9 +40,31 @@ export function ConversationThread({
 }) {
   const [messages, setMessages] = useState(initialMessages);
   const [content, setContent] = useState("");
+  const [displayMessages, addOptimisticMessage] = useOptimistic<DisplayMessage[], DisplayMessage>(
+    messages,
+    (current, message) => current.some((item) => item.id === message.id) ? current : [...current, message],
+  );
   const [state, action, pending] = useActionState(async (previousState: SendMessageState, formData: FormData) => {
+    const pendingContent = String(formData.get("content") ?? "").trim();
+    if (pendingContent) {
+      addOptimisticMessage({
+        id: `sending-${crypto.randomUUID()}`,
+        conversationId,
+        senderId: currentUserId,
+        content: pendingContent,
+        createdAt: new Date().toISOString(),
+        readAt: null,
+        optimistic: true,
+      });
+    }
     const result = await sendMessageAction(previousState, formData);
-    if (result.status === "success") setContent("");
+    if (result.status === "success" && result.sentMessage) {
+      const sentMessage = result.sentMessage;
+      setMessages((current) => current.some((message) => message.id === sentMessage.id)
+        ? current
+        : [...current, sentMessage]);
+      setContent("");
+    }
     return result;
   }, initialState);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -71,22 +95,22 @@ export function ConversationThread({
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [displayMessages]);
 
   return (
     <section className="flex min-h-[55svh] flex-col rounded-3xl border border-border bg-card">
       <div className="flex-1 space-y-3 overflow-y-auto p-4 sm:p-6" aria-live="polite">
-        {messages.length === 0 ? (
+        {displayMessages.length === 0 ? (
           <div className="grid min-h-64 place-items-center text-center">
             <div><p className="font-semibold">Start the conversation</p>
               <p className="mt-1 text-sm text-muted-foreground">Keep card credentials and private financial details out of chat.</p></div>
           </div>
-        ) : messages.map((message) => {
+        ) : displayMessages.map((message) => {
           const mine = message.senderId === currentUserId;
           return <div key={message.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
-            <div className={cn("max-w-[85%] rounded-2xl px-4 py-2.5 sm:max-w-[70%]", mine ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-muted")}>
+            <div className={cn("max-w-[85%] rounded-2xl px-4 py-2.5 sm:max-w-[70%]", mine ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-muted", message.optimistic && "opacity-75")}>
               <p className="whitespace-pre-wrap break-words text-sm leading-6">{message.content}</p>
-              <p className={cn("mt-1 text-[10px]", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>{messageTime(message.createdAt)}</p>
+              <p className={cn("mt-1 text-[10px]", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>{message.optimistic ? "Sending…" : messageTime(message.createdAt)}</p>
             </div>
           </div>;
         })}

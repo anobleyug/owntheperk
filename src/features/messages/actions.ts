@@ -5,11 +5,22 @@ import { z } from "zod";
 
 import { createClient } from "@/lib/supabase/server";
 import { containsSensitiveContent } from "./sensitive-content";
+import type { MessageDTO } from "./types";
 
 export type SendMessageState = {
   status: "idle" | "success" | "error";
   message?: string;
   sentAt?: number;
+  sentMessage?: MessageDTO;
+};
+
+type InsertedMessageRow = {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  read_at: string | null;
 };
 
 const messageSchema = z.object({
@@ -39,16 +50,30 @@ export async function sendMessageAction(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { status: "error", message: "Sign in to send messages." };
 
-  const { error } = await supabase.from("messages").insert({
-    conversation_id: parsed.data.conversationId,
-    sender_id: user.id,
-    content: parsed.data.content,
-  });
-  if (error) return { status: "error", message: "This message could not be sent." };
+  const { data, error } = await supabase.from("messages")
+    .insert({
+      conversation_id: parsed.data.conversationId,
+      sender_id: user.id,
+      content: parsed.data.content,
+    })
+    .select("id, conversation_id, sender_id, content, created_at, read_at")
+    .single<InsertedMessageRow>();
+  if (error || !data) return { status: "error", message: "This message could not be sent." };
 
   revalidatePath(`/messages/${parsed.data.conversationId}`);
   revalidatePath("/messages");
-  return { status: "success", sentAt: Date.now() };
+  return {
+    status: "success",
+    sentAt: Date.now(),
+    sentMessage: {
+      id: data.id,
+      conversationId: data.conversation_id,
+      senderId: data.sender_id,
+      content: data.content,
+      createdAt: data.created_at,
+      readAt: data.read_at,
+    },
+  };
 }
 
 export async function markConversationReadAction(conversationId: string) {
