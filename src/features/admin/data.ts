@@ -3,7 +3,8 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { EvidenceStatus, RewardType } from "@/features/offers/types";
-import type { AdminReportDTO, AdminVerificationDTO } from "./types";
+import { adminAnalyticsSchema } from "./analytics-schema";
+import type { AdminAnalyticsDTO, AdminReportDTO, AdminVerificationDTO } from "./types";
 
 type ListingRow = {
   id: string; offer_id: string; user_id: string; min_spend: number | string;
@@ -105,4 +106,33 @@ export async function getModerationReports(supabase: SupabaseClient): Promise<Ad
     contextMerchantName: row.listing_merchant_name ?? row.conversation_merchant_name,
     contextOfferTitle: row.listing_offer_title ?? row.conversation_offer_title,
   }));
+}
+
+export async function getAdminAnalytics(supabase: SupabaseClient): Promise<AdminAnalyticsDTO> {
+  const { data, error } = await supabase.rpc("get_marketplace_analytics");
+  if (error) throw new Error("Unable to load marketplace analytics.");
+
+  const parsed = adminAnalyticsSchema.safeParse(data);
+  if (!parsed.success) throw new Error("Marketplace analytics returned an invalid response.");
+  const analytics = parsed.data;
+  const mapMerchant = (merchant: typeof analytics.top_merchants_by_listings[number]) => ({
+    merchantId: merchant.merchant_id,
+    merchantName: merchant.merchant_name,
+    count: merchant.count,
+  });
+
+  return {
+    totalUsers: analytics.total_users,
+    activeUsers: analytics.active_users,
+    activeVerifiedListings: analytics.active_verified_listings,
+    pendingVerifications: analytics.pending_verifications,
+    completedInteractions: analytics.completed_interactions,
+    chatUnlockCount: analytics.chat_unlock_count,
+    platformRevenueCents: analytics.platform_revenue_cents,
+    openReports: analytics.open_reports,
+    listingToChatConversion: analytics.listing_to_chat_conversion,
+    repeatBuyerCount: analytics.repeat_buyer_count,
+    topMerchantsByListings: analytics.top_merchants_by_listings.map(mapMerchant),
+    topMerchantsBySearches: analytics.top_merchants_by_searches.map(mapMerchant),
+  };
 }

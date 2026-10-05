@@ -36,3 +36,24 @@ export type AdminReportDTO = {
   contextMerchantName: string | null;
   contextOfferTitle: string | null;
 };
+
+export type MerchantAnalyticsDTO = {
+  merchantId: string;
+  merchantName: string;
+  count: number;
+};
+
+export type AdminAnalyticsDTO = {
+  totalUsers: number;
+  activeUsers: number;
+  activeVerifiedListings: number;
+  pendingVerifications: number;
+  completedInteractions: number;
+  chatUnlockCount: number;
+  platformRevenueCents: number;
+  openReports: number;
+  listingToChatConversion: number;
+  repeatBuyerCount: number;
+  topMerchantsByListings: MerchantAnalyticsDTO[];
+  topMerchantsBySearches: MerchantAnalyticsDTO[];
+};

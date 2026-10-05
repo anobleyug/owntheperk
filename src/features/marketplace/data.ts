@@ -72,3 +72,8 @@ export async function getMarketplaceListing(supabase: SupabaseClient, listingId:
   if (error || !data) return null;
   return mapMarketplaceRow(data);
 }
+
+export async function recordMarketplaceSearch(supabase: SupabaseClient, query: string) {
+  const { error } = await supabase.rpc("record_marketplace_search", { search_query: query });
+  return !error;
+}

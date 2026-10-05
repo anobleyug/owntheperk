@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { ListingCard } from "@/features/marketplace/components/listing-card";
-import { searchMarketplaceListings } from "@/features/marketplace/data";
+import { recordMarketplaceSearch, searchMarketplaceListings } from "@/features/marketplace/data";
 import { formatReward } from "@/features/marketplace/format";
 import { parseMarketplaceFilters } from "@/features/marketplace/schema";
 import { createClient } from "@/lib/supabase/server";
@@ -27,7 +27,10 @@ export default async function SearchPage({ searchParams }: {
   const rawParams = await searchParams;
   const filters = parseMarketplaceFilters(rawParams);
   const supabase = await createClient();
-  const { listings, total, pageSize } = await searchMarketplaceListings(supabase, filters);
+  const [{ listings, total, pageSize }] = await Promise.all([
+    searchMarketplaceListings(supabase, filters),
+    filters.q && filters.page === 1 ? recordMarketplaceSearch(supabase, filters.q) : Promise.resolve(true),
+  ]);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const grouped = Map.groupBy(listings, (listing) => [
     listing.merchantSlug, listing.offerTitle, listing.rewardType, listing.rewardAmount,
