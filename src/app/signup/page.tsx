@@ -12,7 +12,7 @@ export default function SignupPage() {
     <AuthCard
       eyebrow="Private by default"
       title="Create your account"
-      description="Your email is used for authentication only. Marketplace members will see the pseudonymous profile you create next."
+      description="Your email is used for authentication only. Marketplace members will see the anonymous profile you create next."
       footer={
         <>
           Already have an account?{" "}

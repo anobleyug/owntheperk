@@ -100,7 +100,7 @@ export function ProfileForm({
           className={`${inputClassName} resize-y py-3`}
         />
         <p id="bio-help" className="text-xs leading-5 text-muted-foreground">
-          Keep it pseudonymous and under 240 characters.
+          Keep your identity private and stay under 240 characters.
         </p>
         {state.fieldErrors?.bio?.[0] ? (
           <p id="bio-error" className="text-xs font-medium text-red-700">

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s · Own the Perk",
   },
   description:
-    "Discover verified merchant-specific card offers, evaluate pseudonymous reputation, and connect privately.",
+    "Find verified card offers, compare anonymous seller ratings, and connect privately.",
   applicationName: "Own the Perk",
   manifest: "/manifest.webmanifest",
   appleWebApp: {

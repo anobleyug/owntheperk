@@ -11,11 +11,11 @@ import type { CanonicalOfferDTO, MerchantDTO, OfferCardOptionDTO, PrivateOfferLi
 type ListingAction = (state: FormState, formData: FormData) => Promise<FormState>;
 const inputClass = "min-h-12 w-full rounded-2xl border border-input bg-background px-4 text-base outline-none focus:border-primary focus:ring-2 focus:ring-ring/25";
 
-function SubmitButtons() {
+function SubmitButtons({ listingFeePaid }: { listingFeePaid: boolean }) {
   const { pending } = useFormStatus();
   return <div className="sticky-mobile-action sticky z-20 -mx-4 flex flex-col gap-3 border-t border-border bg-background/95 p-4 backdrop-blur sm:static sm:mx-0 sm:flex-row sm:border-0 sm:bg-transparent sm:p-0">
     <Button type="submit" name="intent" value="draft" variant="outline" size="lg" className="w-full sm:w-auto" disabled={pending}><Save aria-hidden="true" /> {pending ? "Saving…" : "Save draft"}</Button>
-    <Button type="submit" name="intent" value="submit" size="lg" className="w-full sm:w-auto" disabled={pending}><Send aria-hidden="true" /> {pending ? "Submitting…" : "Submit for verification"}</Button>
+    <Button type="submit" name="intent" value="submit" size="lg" className="w-full sm:w-auto" disabled={pending}><Send aria-hidden="true" /> {pending ? "Saving…" : listingFeePaid ? "Submit for verification" : "Continue to payment — $0.99"}</Button>
   </div>;
 }
 
@@ -108,6 +108,6 @@ export function OfferListingForm({ action, cards, merchants, offers, listing }: 
       <ErrorText errors={state.fieldErrors?.evidence} />
     </div>
     {state.message ? <p role="alert" className={state.status === "error" ? "rounded-2xl bg-red-50 p-4 text-sm text-red-800" : "text-sm text-primary"}>{state.message}</p> : null}
-    <SubmitButtons />
+    <SubmitButtons listingFeePaid={listing?.listingFeeStatus === "SUCCEEDED"} />
   </form>;
 }

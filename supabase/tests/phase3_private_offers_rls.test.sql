@@ -1,6 +1,6 @@
 begin;
 
-select plan(33);
+select plan(34);
 
 insert into auth.users (id, email)
 values
@@ -100,6 +100,21 @@ select throws_ok(
   $$ insert into public.offer_listing_verifications (user_id, offer_listing_id, card_id, evidence_path) values ('55555555-5555-4555-8555-555555555555', '44444444-1000-4000-8000-000000000002', '44444444-0000-4000-8000-000000000001', '55555555-5555-4555-8555-555555555555/44444444-1000-4000-8000-000000000002/55555555-2000-4000-8000-000000000001.png') $$,
   '42501', null, 'evidence cannot be registered as another user'
 );
+select throws_ok(
+  $$ select public.submit_offer_listing_for_verification('44444444-1000-4000-8000-000000000001') $$,
+  '22023', 'The listing submission fee must be paid first.', 'an unpaid listing remains a draft'
+);
+
+reset role;
+insert into public.platform_payments (
+  user_id, offer_listing_id, payment_type, amount, currency,
+  stripe_checkout_session_id, stripe_payment_intent_id, status
+) values (
+  '44444444-4444-4444-8444-444444444444', '44444444-1000-4000-8000-000000000001',
+  'LISTING_FEE', 99, 'usd', 'cs_phase3_listing_fee', 'pi_phase3_listing_fee', 'SUCCEEDED'
+);
+set local role authenticated;
+
 select lives_ok(
   $$ select public.submit_offer_listing_for_verification('44444444-1000-4000-8000-000000000001') $$,
   'an owned listing with uploaded evidence can be submitted'
@@ -113,6 +128,13 @@ select results_eq(
 reset role;
 insert into public.offer_listings (id, user_id, card_id, offer_id, min_spend, ask_amount)
 values ('44444444-1000-4000-8000-000000000004', '44444444-4444-4444-8444-444444444444', '44444444-0000-4000-8000-000000000002', 'aaaaaaaa-1000-4000-8000-000000000004', 10, 5);
+insert into public.platform_payments (
+  user_id, offer_listing_id, payment_type, amount, currency,
+  stripe_checkout_session_id, stripe_payment_intent_id, status
+) values (
+  '44444444-4444-4444-8444-444444444444', '44444444-1000-4000-8000-000000000004',
+  'LISTING_FEE', 99, 'usd', 'cs_phase3_expired_fee', 'pi_phase3_expired_fee', 'SUCCEEDED'
+);
 set local role authenticated;
 
 select throws_ok(

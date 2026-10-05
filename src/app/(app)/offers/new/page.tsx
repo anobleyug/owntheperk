@@ -26,7 +26,7 @@ export default async function NewOfferPage() {
       <PageHeader
         eyebrow="Private listing setup"
         title="Add a listing"
-        description="Save a draft at any time. Submission requires private evidence and always enters pending verification."
+        description="Save a draft at any time. Add private evidence, then pay the one-time $0.99 fee to submit it for verification."
       />
 
       {!cards.length ? (

@@ -18,6 +18,7 @@ export type ConversationDTO = {
   isSeller: boolean;
   otherUserId: string;
   otherUsername: string;
+  otherAvatarUrl: string | null;
   otherRatingAverage: number;
   otherRatingCount: number;
   otherCompletedInteractionCount: number;

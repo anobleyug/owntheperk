@@ -35,7 +35,7 @@ export default async function SearchPage({ searchParams }: {
   ].join("|"));
 
   return <div className="space-y-8">
-    <PageHeader eyebrow="Verified marketplace" title="Find an offer listing" description="Compare independent cardholder listings by Ask, Min Spend, OBO, expiration, and pseudonymous reputation." />
+    <PageHeader eyebrow="Verified marketplace" title="Find an offer listing" description="Compare listings by Ask, Min Spend, OBO, expiration, and anonymous seller ratings." />
 
     <form action="/search" className="rounded-3xl border border-border bg-card p-4 sm:p-6">
       <div className="flex items-center gap-2"><SlidersHorizontal aria-hidden="true" className="size-5 text-primary" /><h2 className="font-semibold">Search and filters</h2></div>

@@ -71,7 +71,7 @@ select throws_ok(
   '22023', 'Only completed interactions can be rated.', 'active interaction cannot be rated'
 );
 select lives_ok($$ select public.set_interaction_status('91000000-4000-4000-8000-000000000001', 'COMPLETED') $$, 'participant completes interaction');
-select is((select status::text from public.conversations where id = '91000000-4000-4000-8000-000000000001'), 'COMPLETED', 'conversation is completed');
+select is((select status::text from public.participant_conversations where id = '91000000-4000-4000-8000-000000000001'), 'COMPLETED', 'conversation is completed');
 select is((select completed_interaction_count from public.profiles where id = '91000000-0000-4000-8000-000000000001'), 1, 'seller completed count aggregates');
 select is((select completed_interaction_count from public.profiles where id = '91000000-0000-4000-8000-000000000002'), 1, 'buyer completed count aggregates');
 select lives_ok(

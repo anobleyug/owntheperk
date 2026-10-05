@@ -23,6 +23,7 @@ type MessageRow = {
 type PublicProfileRow = {
   id: string;
   username: string;
+  avatar_url: string | null;
   rating_average: number | string;
   rating_count: number;
   completed_interaction_count: number;
@@ -32,7 +33,7 @@ async function participantProfiles(supabase: SupabaseClient, rows: ConversationR
   const ids = [...new Set(rows.flatMap((row) => [row.seller_user_id, row.buyer_user_id]))];
   if (!ids.length) return new Map<string, PublicProfileRow>();
   const { data } = await supabase.from("public_profiles")
-    .select("id, username, rating_average, rating_count, completed_interaction_count").in("id", ids);
+    .select("id, username, avatar_url, rating_average, rating_count, completed_interaction_count").in("id", ids);
   return new Map(((data ?? []) as PublicProfileRow[]).map((profile) => [profile.id, profile]));
 }
 
@@ -56,6 +57,7 @@ function mapConversation(row: ConversationRow, currentUserId: string, profiles: 
     isSeller,
     otherUserId,
     otherUsername: otherProfile?.username ?? (!isSeller ? row.seller_username : "Marketplace member"),
+    otherAvatarUrl: otherProfile?.avatar_url ?? null,
     otherRatingAverage: otherProfile ? Number(otherProfile.rating_average) : (!isSeller ? Number(row.seller_rating_average) : 0),
     otherRatingCount: otherProfile?.rating_count ?? 0,
     otherCompletedInteractionCount: otherProfile?.completed_interaction_count ?? 0,
@@ -65,7 +67,7 @@ function mapConversation(row: ConversationRow, currentUserId: string, profiles: 
 }
 
 export async function getConversations(supabase: SupabaseClient, currentUserId: string) {
-  const { data, error } = await supabase.from("conversations").select(CONVERSATION_COLUMNS)
+  const { data, error } = await supabase.from("participant_conversations").select(CONVERSATION_COLUMNS)
     .neq("status", "LOCKED").order("updated_at", { ascending: false });
   if (error) throw new Error("Unable to load conversations.");
   const rows = (data ?? []) as ConversationRow[];
@@ -81,7 +83,7 @@ export async function getConversations(supabase: SupabaseClient, currentUserId: 
 }
 
 export async function getConversation(supabase: SupabaseClient, conversationId: string, currentUserId: string) {
-  const { data, error } = await supabase.from("conversations").select(CONVERSATION_COLUMNS)
+  const { data, error } = await supabase.from("participant_conversations").select(CONVERSATION_COLUMNS)
     .eq("id", conversationId).maybeSingle<ConversationRow>();
   if (error || !data) return null;
   const profiles = await participantProfiles(supabase, [data]);

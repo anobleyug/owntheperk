@@ -39,8 +39,8 @@ export default async function OnboardingPage() {
             Create your public identity
           </h1>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-            Your public profile is pseudonymous. Your email and private account
-            information are not shown to other users.
+            Your identity stays private. Other users see only the anonymous profile
+            you create here, never your email or private account information.
           </p>
           <div className="mt-8">
             <ProfileForm

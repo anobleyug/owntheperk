@@ -5,7 +5,6 @@ type OfferPreviewCardProps = {
   spend: string;
   reward: string;
   expires: string;
-  username: string;
   rating: string;
   interactions: number;
   tone?: "mint" | "sand" | "sky";
@@ -25,7 +24,6 @@ export function OfferPreviewCard({
   reward,
   spend,
   tone = "mint",
-  username,
 }: OfferPreviewCardProps) {
   return (
     <article className="group rounded-3xl border border-border bg-card p-4 shadow-[0_18px_55px_-42px_rgba(16,48,51,0.6)] transition-transform sm:p-5 lg:hover:-translate-y-0.5">
@@ -73,7 +71,7 @@ export function OfferPreviewCard({
       </p>
 
       <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4 text-xs">
-        <span className="truncate font-semibold">{username}</span>
+        <span className="truncate font-semibold">Anonymous seller</span>
         <span className="flex shrink-0 items-center gap-3 text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <Star aria-hidden="true" className="size-3.5 fill-current text-[#b98224]" />

@@ -25,7 +25,7 @@ export function SafetyActions({
   offerListingId,
   initiallyBlocked = false,
 }: {
-  targetUserId: string;
+  targetUserId?: string;
   conversationId?: string;
   offerListingId?: string;
   initiallyBlocked?: boolean;
@@ -38,13 +38,14 @@ export function SafetyActions({
     <h2 className="font-semibold">Safety</h2>
     <div className="mt-3 flex flex-wrap gap-2">
       <form action={blockAction}>
-        <input type="hidden" name="targetUserId" value={targetUserId} />
+        {targetUserId ? <input type="hidden" name="targetUserId" value={targetUserId} /> : null}
+        <input type="hidden" name="offerListingId" value={offerListingId ?? ""} />
         <Button type="submit" variant="outline" disabled={blocking || blocked}><ShieldBan aria-hidden="true" /> {blocked ? "Blocked" : blocking ? "Blocking…" : "Block User"}</Button>
       </form>
       {canReport && <details className="w-full rounded-2xl border border-border p-3 sm:w-auto sm:min-w-80">
         <summary className="flex min-h-8 cursor-pointer list-none items-center gap-2 text-sm font-semibold"><Flag aria-hidden="true" className="size-4" /> Report</summary>
         <form action={reportAction} className="mt-4 space-y-3">
-          <input type="hidden" name="reportedUserId" value={targetUserId} />
+          {targetUserId ? <input type="hidden" name="reportedUserId" value={targetUserId} /> : null}
           <input type="hidden" name="conversationId" value={conversationId ?? ""} />
           <input type="hidden" name="offerListingId" value={offerListingId ?? ""} />
           <label className="grid gap-1.5 text-xs font-semibold"><span>Reason</span>

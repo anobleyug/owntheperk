@@ -5,6 +5,7 @@ export type CanonicalOfferStatus = "ACTIVE" | "INACTIVE" | "EXPIRED";
 export type OfferVerificationStatus = "DRAFT" | "PENDING" | "VERIFIED" | "REJECTED" | "NEEDS_REVIEW" | "EXPIRED";
 export type OfferListingStatus = "DRAFT" | "PENDING_VERIFICATION" | "ACTIVE" | "PAUSED" | "EXPIRED" | "REMOVED";
 export type EvidenceStatus = "PENDING" | "VERIFIED" | "REJECTED" | "NEEDS_REVIEW";
+export type ListingFeeStatus = "PENDING" | "SUCCEEDED" | "FAILED" | "REFUNDED";
 
 export type MerchantDTO = { id: string; name: string; slug: string; category: string | null };
 export type CanonicalOfferDTO = {
@@ -43,4 +44,5 @@ export type PrivateOfferListingDTO = {
   cardNickname: string;
   cardIssuer: string;
   evidence: { id: string; status: EvidenceStatus } | null;
+  listingFeeStatus: ListingFeeStatus | null;
 };

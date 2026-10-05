@@ -11,7 +11,6 @@ import { unlockChatAction } from "@/features/payments/actions";
 import { MerchantFollowButton } from "@/features/notifications/components/merchant-follow-button";
 import { isMerchantFollowed } from "@/features/notifications/data";
 import { SafetyActions } from "@/features/trust/components/safety-actions";
-import { hasBlockedUser } from "@/features/trust/data";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Verified offer listing" };
@@ -25,16 +24,13 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
   const [listing, ownListingResult, conversationResult] = await Promise.all([
     getMarketplaceListing(supabase, id),
     user ? supabase.from("offer_listings").select("id").eq("id", id).eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null }),
-    user ? supabase.from("conversations").select("id, status").eq("listing_id", id).eq("buyer_user_id", user.id).maybeSingle<{ id: string; status: string }>() : Promise.resolve({ data: null }),
+    user ? supabase.from("participant_conversations").select("id, status").eq("listing_id", id).eq("buyer_user_id", user.id).maybeSingle<{ id: string; status: string }>() : Promise.resolve({ data: null }),
   ]);
   if (!listing) notFound();
   const isOwner = Boolean(ownListingResult.data);
   const conversation = conversationResult.data;
   const unlocked = conversation && conversation.status !== "LOCKED";
-  const [hasBlocked, merchantFollowed] = await Promise.all([
-    user && !isOwner ? hasBlockedUser(supabase, user.id, listing.sellerUserId) : Promise.resolve(false),
-    user ? isMerchantFollowed(supabase, user.id, listing.merchantId) : Promise.resolve(false),
-  ]);
+  const merchantFollowed = user ? await isMerchantFollowed(supabase, user.id, listing.merchantId) : false;
   const checkoutAction = unlockChatAction.bind(null, id);
 
   return <div className="mx-auto max-w-4xl space-y-6">
@@ -70,12 +66,11 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
       </div>
     </section>
 
-    {!isOwner && <SafetyActions targetUserId={listing.sellerUserId} offerListingId={listing.listingId} initiallyBlocked={hasBlocked} />}
+    {!isOwner ? <SafetyActions offerListingId={listing.listingId} /> : null}
 
     <section className="sticky-mobile-action sticky z-20 rounded-3xl border border-border bg-background/95 p-4 shadow-lg backdrop-blur lg:bottom-4">
       {isOwner ? <Button type="button" size="lg" className="w-full" disabled>Your Listing</Button>
         : unlocked ? <Button asChild size="lg" className="w-full"><Link href={`/messages/${conversation.id}`}>Open Conversation</Link></Button>
-          : hasBlocked ? <Button type="button" size="lg" className="w-full" disabled>Chat unavailable</Button>
           : <form action={checkoutAction}><Button type="submit" size="lg" className="w-full">Unlock Chat — $1.99</Button></form>}
       <p className="mt-2 text-center text-xs text-muted-foreground">
         {isOwner ? "You cannot unlock chat on your own listing." : unlocked ? "Your private conversation is ready." : "One-time platform fee for access to this conversation."}

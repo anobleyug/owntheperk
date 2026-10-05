@@ -1,4 +1,4 @@
-import { BadgeCheck, MessageCircle, Star } from "lucide-react";
+import { BadgeCheck, MessageCircle, Star, UserRound } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -44,10 +44,21 @@ export default async function ConversationPage({ params }: { params: Promise<{ c
           <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">{conversation.merchantName}</p>
           <h1 className="mt-1 text-xl font-semibold">{formatReward(conversation)}</h1>
           <p className="mt-2 text-sm"><span className="text-muted-foreground">Ask:</span> {formatMoney(conversation.askAmount)}{conversation.isObo ? " OBO" : ""}</p>
-          <Link href={`/users/${conversation.otherUserId}`} className="mt-2 inline-flex flex-wrap items-center gap-2 text-sm font-semibold hover:text-primary">
-            <span>{conversation.otherUsername}</span>
-            <span className="inline-flex items-center gap-1 text-xs font-normal text-muted-foreground"><Star aria-hidden="true" className="size-3.5 fill-current text-[#b98224]" /> {conversation.otherRatingCount ? conversation.otherRatingAverage.toFixed(1) : "New"} · {conversation.otherRatingCount} reviews</span>
-            <span className="inline-flex items-center gap-1 text-xs font-normal text-muted-foreground"><MessageCircle aria-hidden="true" className="size-3.5" /> {conversation.otherCompletedInteractionCount} completed</span>
+          <Link href={`/users/${conversation.otherUserId}`} className="mt-3 flex items-center gap-3 rounded-2xl outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-ring">
+            {conversation.otherAvatarUrl ? (
+              // Anonymous marketplace avatars are revealed only in unlocked conversation context.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={conversation.otherAvatarUrl} alt="" referrerPolicy="no-referrer" className="size-10 rounded-full bg-muted object-cover" />
+            ) : (
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-ink text-primary-foreground"><UserRound aria-hidden="true" className="size-4" /></span>
+            )}
+            <span className="flex min-w-0 flex-col gap-1">
+              <span className="truncate text-sm font-semibold">{conversation.otherUsername}</span>
+              <span className="flex flex-wrap items-center gap-2 text-xs font-normal text-muted-foreground">
+                <span className="inline-flex items-center gap-1"><Star aria-hidden="true" className="size-3.5 fill-current text-[#b98224]" /> {conversation.otherRatingCount ? conversation.otherRatingAverage.toFixed(1) : "New"} · {conversation.otherRatingCount} reviews</span>
+                <span className="inline-flex items-center gap-1"><MessageCircle aria-hidden="true" className="size-3.5" /> {conversation.otherCompletedInteractionCount} completed</span>
+              </span>
+            </span>
           </Link>
         </div>
         <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-primary"><BadgeCheck aria-hidden="true" className="size-3.5" /> Verified</span>

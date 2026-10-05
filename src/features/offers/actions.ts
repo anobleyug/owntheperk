@@ -143,8 +143,8 @@ export async function createOfferListingAction(_state: FormState, formData: Form
     if ("error" in stored) return { status: "error", message: stored.error };
   }
   if (intent === "submit") {
-    const submissionError = await submitListing(supabase, listingId);
-    if (submissionError) return { status: "error", message: submissionError };
+    revalidatePath("/offers");
+    redirect(`/offers/${listingId}?listingFee=required`);
   }
   revalidatePath("/offers");
   redirect(`/offers/${listingId}`);
@@ -194,8 +194,20 @@ export async function updateOfferListingAction(listingId: string, _state: FormSt
     if ("error" in stored) return { status: "error", message: stored.error };
   }
   if (formData.get("intent") === "submit") {
-    const submissionError = await submitListing(supabase, listingId);
-    if (submissionError) return { status: "error", message: submissionError };
+    const { data: paidFee } = await supabase.from("platform_payments")
+      .select("id")
+      .eq("offer_listing_id", listingId)
+      .eq("payment_type", "LISTING_FEE")
+      .eq("status", "SUCCEEDED")
+      .maybeSingle();
+    if (paidFee) {
+      const submissionError = await submitListing(supabase, listingId);
+      if (submissionError) return { status: "error", message: submissionError };
+    } else {
+      revalidatePath("/offers");
+      revalidatePath(`/offers/${listingId}`);
+      redirect(`/offers/${listingId}?listingFee=required`);
+    }
   }
   revalidatePath("/offers");
   revalidatePath(`/offers/${listingId}`);

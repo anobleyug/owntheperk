@@ -18,7 +18,7 @@ export default async function LoginPage({
     <AuthCard
       eyebrow="Welcome back"
       title="Log in"
-      description="Use your verified email to access the marketplace and your pseudonymous profile."
+      description="Use your verified email to access the marketplace and your anonymous profile."
       footer={
         <>
           New here?{" "}

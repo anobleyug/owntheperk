@@ -5,7 +5,6 @@ export type MarketplaceSort = (typeof MARKETPLACE_SORTS)[number];
 
 export type MarketplaceListingDTO = {
   listingId: string;
-  sellerUserId: string;
   merchantId: string;
   merchantName: string;
   merchantSlug: string;
@@ -18,8 +17,6 @@ export type MarketplaceListingDTO = {
   askAmount: number;
   isObo: boolean;
   expirationDate: string;
-  sellerUsername: string;
-  sellerAvatarUrl: string | null;
   sellerRatingAverage: number;
   sellerRatingCount: number;
   sellerCompletedInteractionCount: number;

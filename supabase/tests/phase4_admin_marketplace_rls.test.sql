@@ -129,10 +129,13 @@ select results_eq(
 
 select set_config('request.jwt.claims', '{"sub":"77777777-7777-4777-8777-777777777777","role":"authenticated"}', true);
 select is((select count(*)::integer from public.marketplace_listings), 1, 'buyer sees only active verified unexpired listing');
-select results_eq(
-  $$ select merchant_name, seller_username, ask_amount from public.marketplace_listings $$,
-  $$ values ('Adobe'::text, 'PhaseSeller'::text, 500.00::numeric) $$,
-  'marketplace exposes whitelisted seller and listing terms'
+select ok(
+  not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'marketplace_listings'
+      and column_name in ('seller_user_id', 'seller_username', 'seller_avatar_url')
+  ),
+  'marketplace DTO excludes seller identity before chat unlock'
 );
 select is((select bool_and(verification_badge) from public.marketplace_listings), true, 'published listings carry verification badge');
 select is((select count(*)::integer from public.offer_listing_verifications), 0, 'buyer cannot read evidence metadata');

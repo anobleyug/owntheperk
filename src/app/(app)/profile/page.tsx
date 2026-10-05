@@ -43,9 +43,9 @@ export default async function ProfilePage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Pseudonymous identity"
+        eyebrow="Anonymous profile"
         title="Your profile"
-        description="Manage the public identity and reputation placeholders other marketplace members can see."
+        description="Manage the anonymous profile and reputation details other marketplace members can see after connecting."
       />
 
       <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
