@@ -1,6 +1,10 @@
 "use client";
 
-import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import type {
+  RealtimeChannel,
+  RealtimePostgresChangesPayload,
+  Session,
+} from "@supabase/supabase-js";
 import { Send } from "lucide-react";
 import { useActionState, useEffect, useOptimistic, useRef, useState } from "react";
 
@@ -71,26 +75,42 @@ export function ConversationThread({
 
   useEffect(() => {
     const supabase = createClient();
-    const channel = supabase.channel(`conversation:${conversationId}`)
-      .on("postgres_changes", {
-        event: "INSERT",
-        schema: "public",
-        table: "messages",
-        filter: `conversation_id=eq.${conversationId}`,
-      }, (payload: RealtimePostgresChangesPayload<MessageRow>) => {
-        const row = payload.new as MessageRow;
-        setMessages((current) => current.some((message) => message.id === row.id) ? current : [...current, {
-          id: row.id,
-          conversationId: row.conversation_id,
-          senderId: row.sender_id,
-          content: row.content,
-          createdAt: row.created_at,
-          readAt: row.read_at,
-        }]);
-        if (row.sender_id !== currentUserId) void markConversationReadAction(conversationId);
-      }).subscribe();
+    let channel: RealtimeChannel | undefined;
+    let cancelled = false;
+
+    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
+      if (cancelled) return;
+      // Join the socket as the signed-in user (not anon) so RLS lets the row through.
+      supabase.realtime.setAuth(data.session?.access_token ?? null);
+
+      channel = supabase.channel(`conversation:${conversationId}`)
+        .on("postgres_changes", {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        }, (payload: RealtimePostgresChangesPayload<MessageRow>) => {
+          const row = payload.new as MessageRow;
+          setMessages((current) => current.some((message) => message.id === row.id) ? current : [...current, {
+            id: row.id,
+            conversationId: row.conversation_id,
+            senderId: row.sender_id,
+            content: row.content,
+            createdAt: row.created_at,
+            readAt: row.read_at,
+          }]);
+          if (row.sender_id !== currentUserId) void markConversationReadAction(conversationId);
+        })
+        .subscribe((status: string, err?: Error) => {
+          console.log("[rt] status:", status, err);
+        });
+    });
+
     void markConversationReadAction(conversationId);
-    return () => { void supabase.removeChannel(channel); };
+    return () => {
+      cancelled = true;
+      if (channel) void supabase.removeChannel(channel);
+    };
   }, [conversationId, currentUserId]);
 
   useEffect(() => {
