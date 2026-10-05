@@ -12,3 +12,7 @@ export async function getCurrentRole(supabase: SupabaseClient, userId: string): 
 export async function isCurrentUserAdmin(supabase: SupabaseClient, userId: string) {
   return (await getCurrentRole(supabase, userId)) === "ADMIN";
 }
+
+export async function canCurrentUserModerate(supabase: SupabaseClient, userId: string) {
+  return ["MODERATOR", "ADMIN"].includes(await getCurrentRole(supabase, userId));
+}

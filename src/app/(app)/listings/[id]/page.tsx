@@ -8,6 +8,8 @@ import { getMarketplaceListing } from "@/features/marketplace/data";
 import { formatExpiration, formatMoney, formatReward } from "@/features/marketplace/format";
 import { offerListingIdSchema } from "@/features/offers/schema";
 import { unlockChatAction } from "@/features/payments/actions";
+import { SafetyActions } from "@/features/trust/components/safety-actions";
+import { hasBlockedUser } from "@/features/trust/data";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Verified offer listing" };
@@ -27,6 +29,7 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
   const isOwner = Boolean(ownListingResult.data);
   const conversation = conversationResult.data;
   const unlocked = conversation && conversation.status !== "LOCKED";
+  const hasBlocked = user && !isOwner ? await hasBlockedUser(supabase, user.id, listing.sellerUserId) : false;
   const checkoutAction = unlockChatAction.bind(null, id);
 
   return <div className="mx-auto max-w-4xl space-y-6">
@@ -55,15 +58,18 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={listing.sellerAvatarUrl} alt="" className="size-12 rounded-full object-cover" referrerPolicy="no-referrer" />
         ) : <span className="grid size-12 place-items-center rounded-full bg-brand-ink text-primary-foreground"><UserRound aria-hidden="true" className="size-5" /></span>}
-        <div><h2 className="font-semibold">{listing.sellerUsername}</h2>
+        <div><Link href={`/users/${listing.sellerUserId}`} className="font-semibold hover:text-primary">{listing.sellerUsername}</Link>
           <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground"><span className="inline-flex items-center gap-1"><Star aria-hidden="true" className="size-3.5 fill-current text-[#b98224]" /> {listing.sellerRatingAverage.toFixed(1)} ({listing.sellerRatingCount})</span><span className="inline-flex items-center gap-1"><MessageCircle aria-hidden="true" className="size-3.5" /> {listing.sellerCompletedInteractionCount} interactions</span></p>
         </div>
       </div>
     </section>
 
+    {!isOwner && <SafetyActions targetUserId={listing.sellerUserId} offerListingId={listing.listingId} initiallyBlocked={hasBlocked} />}
+
     <section className="sticky bottom-20 rounded-3xl border border-border bg-background/95 p-4 shadow-lg backdrop-blur lg:bottom-4">
       {isOwner ? <Button type="button" size="lg" className="w-full" disabled>Your Listing</Button>
         : unlocked ? <Button asChild size="lg" className="w-full"><Link href={`/messages/${conversation.id}`}>Open Conversation</Link></Button>
+          : hasBlocked ? <Button type="button" size="lg" className="w-full" disabled>Chat unavailable</Button>
           : <form action={checkoutAction}><Button type="submit" size="lg" className="w-full">Unlock Chat — $1.99</Button></form>}
       <p className="mt-2 text-center text-xs text-muted-foreground">
         {isOwner ? "You cannot unlock chat on your own listing." : unlocked ? "Your private conversation is ready." : "One-time platform fee for access to this conversation."}

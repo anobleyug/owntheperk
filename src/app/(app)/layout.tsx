@@ -26,7 +26,11 @@ export default async function AuthenticatedAppLayout({
 
   if (!user) redirect("/login");
 
-  const profile = await getOwnProfile(supabase, user.id);
+  const [profile, accountResult] = await Promise.all([
+    getOwnProfile(supabase, user.id),
+    supabase.rpc("current_account_is_active"),
+  ]);
+  if (accountResult.data === false) redirect("/account-suspended");
   if (!profile?.onboardingCompleted) redirect("/onboarding");
 
   return (

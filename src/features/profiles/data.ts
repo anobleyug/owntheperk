@@ -2,7 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { OwnProfileDTO } from "@/features/profiles/types";
+import type { OwnProfileDTO, PublicProfileDTO } from "@/features/profiles/types";
 
 const OWN_PROFILE_COLUMNS =
   "id, username, avatar_url, bio, phone_verified, optional_identity_verified, rating_average, rating_count, completed_interaction_count, response_rate, onboarding_completed, created_at";
@@ -54,4 +54,19 @@ export async function getOwnProfile(
   }
 
   return data ? toOwnProfileDTO(data) : null;
+}
+
+export async function getPublicProfile(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<PublicProfileDTO | null> {
+  const { data, error } = await supabase.from("public_profiles")
+    .select("id, username, avatar_url, bio, phone_verified, optional_identity_verified, rating_average, rating_count, completed_interaction_count, response_rate, created_at")
+    .eq("id", userId).maybeSingle<ProfileRow>();
+  if (error) throw new Error("Unable to load this profile.");
+  if (!data) return null;
+  const profile = toOwnProfileDTO({ ...data, onboarding_completed: true });
+  const { onboardingCompleted: _onboardingCompleted, ...publicProfile } = profile;
+  void _onboardingCompleted;
+  return publicProfile;
 }

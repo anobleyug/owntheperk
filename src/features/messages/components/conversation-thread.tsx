@@ -29,14 +29,20 @@ export function ConversationThread({
   conversationId,
   currentUserId,
   initialMessages,
+  canSend,
 }: {
   conversationId: string;
   currentUserId: string;
   initialMessages: MessageDTO[];
+  canSend: boolean;
 }) {
   const [messages, setMessages] = useState(initialMessages);
   const [content, setContent] = useState("");
-  const [state, action, pending] = useActionState(sendMessageAction, initialState);
+  const [state, action, pending] = useActionState(async (previousState: SendMessageState, formData: FormData) => {
+    const result = await sendMessageAction(previousState, formData);
+    if (result.status === "success") setContent("");
+    return result;
+  }, initialState);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,10 +70,6 @@ export function ConversationThread({
   }, [conversationId, currentUserId]);
 
   useEffect(() => {
-    if (state.status === "success") setContent("");
-  }, [state.sentAt, state.status]);
-
-  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -91,7 +93,7 @@ export function ConversationThread({
         <div ref={bottomRef} />
       </div>
 
-      <form action={action} className="sticky bottom-20 border-t border-border bg-card p-3 sm:p-4 lg:bottom-0">
+      {canSend ? <form action={action} className="sticky bottom-20 border-t border-border bg-card p-3 sm:p-4 lg:bottom-0">
         <input type="hidden" name="conversationId" value={conversationId} />
         <div className="flex items-end gap-2">
           <label htmlFor="message-content" className="sr-only">Message</label>
@@ -111,7 +113,7 @@ export function ConversationThread({
         </div>
         {state.status === "error" && <p role="alert" className="mt-2 text-xs font-medium text-red-700">{state.message}</p>}
         <p className="mt-2 text-[11px] text-muted-foreground">Never share card numbers, CVVs, passwords, SSNs, or bank credentials.</p>
-      </form>
+      </form> : <div className="border-t border-border bg-muted/45 p-4 text-center text-sm text-muted-foreground">This conversation is no longer accepting new messages.</div>}
     </section>
   );
 }

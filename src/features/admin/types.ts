@@ -1,4 +1,5 @@
 import type { EvidenceStatus, RewardType } from "@/features/offers/types";
+import type { ReportReason, ReportStatus } from "@/features/trust/types";
 
 export type AppRole = "USER" | "MODERATOR" | "ADMIN";
 export type ReviewDecision = "APPROVE" | "REJECT" | "NEEDS_REVIEW";
@@ -18,4 +19,20 @@ export type AdminVerificationDTO = {
   sellerUsername: string;
   evidenceStatus: EvidenceStatus;
   submittedAt: string;
+};
+
+export type AdminReportDTO = {
+  id: string;
+  reportedUserId: string;
+  conversationId: string | null;
+  offerListingId: string | null;
+  reason: ReportReason;
+  description: string;
+  status: ReportStatus;
+  createdAt: string;
+  reporterUsername: string;
+  reportedUsername: string;
+  reportedAccountStatus: "ACTIVE" | "SUSPENDED" | "BANNED";
+  contextMerchantName: string | null;
+  contextOfferTitle: string | null;
 };

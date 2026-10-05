@@ -3,7 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { EvidenceStatus, RewardType } from "@/features/offers/types";
-import type { AdminVerificationDTO } from "./types";
+import type { AdminReportDTO, AdminVerificationDTO } from "./types";
 
 type ListingRow = {
   id: string; offer_id: string; user_id: string; min_spend: number | string;
@@ -64,4 +64,45 @@ export async function getPendingVerifications(supabase: SupabaseClient): Promise
       submittedAt: listing.updated_at,
     }];
   });
+}
+
+
+type AdminReportRow = {
+  id: string;
+  reported_user_id: string;
+  conversation_id: string | null;
+  offer_listing_id: string | null;
+  reason: AdminReportDTO["reason"];
+  description: string;
+  status: AdminReportDTO["status"];
+  created_at: string;
+  reporter_username: string;
+  reported_username: string;
+  reported_account_status: AdminReportDTO["reportedAccountStatus"];
+  conversation_merchant_name: string | null;
+  conversation_offer_title: string | null;
+  listing_merchant_name: string | null;
+  listing_offer_title: string | null;
+};
+
+export async function getModerationReports(supabase: SupabaseClient): Promise<AdminReportDTO[]> {
+  const { data, error } = await supabase.from("moderation_report_queue")
+    .select("id, reported_user_id, conversation_id, offer_listing_id, reason, description, status, created_at, reporter_username, reported_username, reported_account_status, conversation_merchant_name, conversation_offer_title, listing_merchant_name, listing_offer_title")
+    .order("created_at", { ascending: true });
+  if (error) throw new Error("Unable to load moderation reports.");
+  return ((data ?? []) as AdminReportRow[]).map((row) => ({
+    id: row.id,
+    reportedUserId: row.reported_user_id,
+    conversationId: row.conversation_id,
+    offerListingId: row.offer_listing_id,
+    reason: row.reason,
+    description: row.description,
+    status: row.status,
+    createdAt: row.created_at,
+    reporterUsername: row.reporter_username,
+    reportedUsername: row.reported_username,
+    reportedAccountStatus: row.reported_account_status,
+    contextMerchantName: row.listing_merchant_name ?? row.conversation_merchant_name,
+    contextOfferTitle: row.listing_offer_title ?? row.conversation_offer_title,
+  }));
 }

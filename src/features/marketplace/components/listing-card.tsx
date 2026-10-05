@@ -23,7 +23,7 @@ export function ListingCard({ listing }: { listing: MarketplaceListingDTO }) {
     </div>
     <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4 text-sm">
       <span className="truncate font-semibold">{listing.sellerUsername}</span>
-      <span className="inline-flex shrink-0 items-center gap-1 text-muted-foreground"><Star aria-hidden="true" className="size-4 fill-current text-[#b98224]" /> {listing.sellerRatingAverage.toFixed(1)} <span className="text-xs">({listing.sellerRatingCount})</span></span>
+      <span className="inline-flex shrink-0 items-center gap-1 text-muted-foreground"><Star aria-hidden="true" className="size-4 fill-current text-[#b98224]" /> {listing.sellerRatingCount ? listing.sellerRatingAverage.toFixed(1) : "New"} <span className="text-xs">· {listing.sellerRatingCount} reviews · {listing.sellerCompletedInteractionCount} completed</span></span>
     </div>
   </Link>;
 }
