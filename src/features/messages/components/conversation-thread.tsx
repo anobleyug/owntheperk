@@ -1,5 +1,6 @@
 "use client";
 
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { Send } from "lucide-react";
 import { useActionState, useEffect, useRef, useState } from "react";
 
@@ -10,6 +11,15 @@ import { markConversationReadAction, sendMessageAction, type SendMessageState } 
 import type { MessageDTO } from "../types";
 
 const initialState: SendMessageState = { status: "idle" };
+
+type MessageRow = {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  read_at: string | null;
+};
 
 function messageTime(value: string) {
   return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date(value));
@@ -37,11 +47,8 @@ export function ConversationThread({
         schema: "public",
         table: "messages",
         filter: `conversation_id=eq.${conversationId}`,
-      }, (payload) => {
-        const row = payload.new as {
-          id: string; conversation_id: string; sender_id: string; content: string;
-          created_at: string; read_at: string | null;
-        };
+      }, (payload: RealtimePostgresChangesPayload<MessageRow>) => {
+        const row = payload.new as MessageRow;
         setMessages((current) => current.some((message) => message.id === row.id) ? current : [...current, {
           id: row.id,
           conversationId: row.conversation_id,
