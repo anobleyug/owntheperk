@@ -15,7 +15,9 @@ const parsedServerEnvironment = serverEnvironmentSchema.safeParse({
 });
 
 if (!parsedServerEnvironment.success) {
+  console.error(
+    "Missing/invalid server env keys:",
+    parsedServerEnvironment.error.issues.map((i) => i.path.join(".")),
+  );
   throw new Error("Invalid server environment configuration.");
 }
-
-export const serverEnv = Object.freeze(parsedServerEnvironment.data);
