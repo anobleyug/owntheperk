@@ -68,7 +68,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ c
     <ConversationThread conversationId={conversation.id} currentUserId={user.id} initialMessages={messages} canSend={conversation.status === "ACTIVE" && !hasBlocked} />
     {conversation.status === "ACTIVE" && <InteractionActions conversationId={conversation.id} otherUsername={conversation.otherUsername} />}
     {conversation.status === "COMPLETED" && !hasRated && <RatingForm conversationId={conversation.id} otherUsername={conversation.otherUsername} />}
-    {conversation.status === "COMPLETED" && hasRated && <section className="rounded-3xl border border-border bg-secondary/50 p-5"><p className="font-semibold text-primary">You rated {conversation.otherUsername}</p><p className="mt-1 text-sm text-muted-foreground">Your rating for this interaction is final and contributes to their marketplace reputation.</p></section>}
+    {conversation.status === "COMPLETED" && hasRated && <section className="rounded-3xl border border-border bg-secondary/50 p-5"><p className="font-semibold text-primary">Already rated</p><p className="mt-1 text-sm text-muted-foreground">You already rated {conversation.otherUsername} for this interaction. Ratings are final.</p></section>}
     <SafetyActions targetUserId={conversation.otherUserId} conversationId={conversation.id} offerListingId={conversation.listingId} initiallyBlocked={hasBlocked} />
   </div>;
 }

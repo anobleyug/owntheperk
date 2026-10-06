@@ -45,8 +45,9 @@ export async function hasSubmittedRating(
   conversationId: string,
   reviewerId: string,
 ) {
-  const { data } = await supabase.from("ratings").select("id")
+  const { data, error } = await supabase.from("ratings").select("id")
     .eq("conversation_id", conversationId).eq("reviewer_id", reviewerId).maybeSingle();
+  if (error) throw new Error("Unable to check whether this interaction was rated.");
   return Boolean(data);
 }
 
