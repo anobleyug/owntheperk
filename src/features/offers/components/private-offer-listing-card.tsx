@@ -12,7 +12,7 @@ function rewardLabel(listing: PrivateOfferListingDTO) {
 }
 
 export function PrivateOfferListingCard({ listing }: { listing: PrivateOfferListingDTO }) {
-  return <Link href={"/offers/" + listing.id} className="block rounded-3xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
+  return <Link href={"/offers/manage/" + listing.id} className="block rounded-3xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
     <div className="flex items-start justify-between gap-4"><div>
       <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">{listing.merchantName}</p>
       <h3 className="mt-2 font-semibold leading-6">{listing.title}</h3>

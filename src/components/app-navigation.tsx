@@ -30,7 +30,7 @@ const navigationItems: NavigationItem[] = [
 
 function isItemActive(pathname: string, href: string) {
   if (href === "/offers") {
-    return pathname === href || (pathname.startsWith("/offers/") && !pathname.startsWith("/offers/new"));
+    return pathname === href || pathname.startsWith("/offers/manage/") || pathname.startsWith("/offers/cards");
   }
 
   return pathname === href || pathname.startsWith(`${href}/`);

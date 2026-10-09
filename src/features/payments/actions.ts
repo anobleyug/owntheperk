@@ -146,7 +146,7 @@ export async function unlockChatAction(listingId: string) {
 }
 
 function listingFeeError(listingId: string, code: string): never {
-  redirect(`/offers/${listingId}?listingFee=${code}`);
+  redirect(`/offers/manage/${listingId}?listingFee=${code}`);
 }
 
 export async function payListingSubmissionFeeAction(listingId: string) {
@@ -154,7 +154,7 @@ export async function payListingSubmissionFeeAction(listingId: string) {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?next=/offers/${listingId}`);
+  if (!user) redirect(`/login?next=/offers/manage/${listingId}`);
   const rateLimit = await checkRateLimits([{
     scope: "CHECKOUT_CREATE", subject: `user:${user.id}`, limit: 10, windowSeconds: 600,
   }]);
@@ -188,7 +188,7 @@ export async function payListingSubmissionFeeAction(listingId: string) {
   if (payment?.status === "SUCCEEDED") {
     const { error } = await supabase.rpc("submit_offer_listing_for_verification", { target_listing_id: listingId });
     if (error && !error.message.includes("not editable")) listingFeeError(listingId, "error");
-    redirect(`/offers/${listingId}?listingFee=paid`);
+    redirect(`/offers/manage/${listingId}?listingFee=paid`);
   }
 
   const stripe = getStripe();
@@ -196,7 +196,7 @@ export async function payListingSubmissionFeeAction(listingId: string) {
     const existing = await stripe.checkout.sessions.retrieve(payment.stripe_checkout_session_id);
     const existingUrl = safeStripeCheckoutUrl(existing.url);
     if (existing.status === "open" && existingUrl) redirect(existingUrl);
-    if (existing.status === "complete") redirect(`/offers/${listingId}?listingFee=processing`);
+    if (existing.status === "complete") redirect(`/offers/manage/${listingId}?listingFee=processing`);
 
     const { data: refreshed, error: refreshError } = await admin.from("platform_payments")
       .update({
@@ -241,7 +241,7 @@ export async function payListingSubmissionFeeAction(listingId: string) {
     }
   }
 
-  if (payment.status === "SUCCEEDED") redirect(`/offers/${listingId}?listingFee=paid`);
+  if (payment.status === "SUCCEEDED") redirect(`/offers/manage/${listingId}?listingFee=paid`);
   if (payment.stripe_checkout_session_id) {
     const concurrentCheckout = await stripe.checkout.sessions.retrieve(payment.stripe_checkout_session_id);
     const concurrentUrl = safeStripeCheckoutUrl(concurrentCheckout.url);
@@ -275,8 +275,8 @@ export async function payListingSubmissionFeeAction(listingId: string) {
         user_id: user.id,
       },
     },
-    success_url: `${publicEnv.NEXT_PUBLIC_APP_URL}/offers/${listingId}?listingFee=success`,
-    cancel_url: `${publicEnv.NEXT_PUBLIC_APP_URL}/offers/${listingId}?listingFee=cancelled`,
+    success_url: `${publicEnv.NEXT_PUBLIC_APP_URL}/offers/manage/${listingId}?listingFee=success`,
+    cancel_url: `${publicEnv.NEXT_PUBLIC_APP_URL}/offers/manage/${listingId}?listingFee=cancelled`,
   }, {
     idempotencyKey: `listing-fee-${payment.id}-${payment.checkout_attempt}`,
   });

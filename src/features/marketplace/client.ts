@@ -3,6 +3,7 @@ import type { PublicReviewDTO } from "@/features/trust/types";
 import type {
   MarketplaceFilters,
   MarketplaceListingDTO,
+  MarketplaceOfferListingsResultDTO,
   MarketplaceSearchResultDTO,
   MerchantSummaryDTO,
 } from "./types";
@@ -23,6 +24,9 @@ async function getJson<T>(url: string): Promise<T> {
 export function marketplaceSearchParams(filters: MarketplaceFilters) {
   const params = new URLSearchParams({ sort: filters.sort, page: String(filters.page) });
   if (filters.q) params.set("q", filters.q);
+  if (filters.issuer) params.set("issuer", filters.issuer);
+  if (filters.cardProduct) params.set("cardProduct", filters.cardProduct);
+  if (filters.maxRequiredSpend !== undefined) params.set("maxRequiredSpend", String(filters.maxRequiredSpend));
   if (filters.maxAsk !== undefined) params.set("maxAsk", String(filters.maxAsk));
   if (filters.maxMinSpend !== undefined) params.set("maxMinSpend", String(filters.maxMinSpend));
   if (filters.minReward !== undefined) params.set("minReward", String(filters.minReward));
@@ -32,8 +36,12 @@ export function marketplaceSearchParams(filters: MarketplaceFilters) {
   return params;
 }
 
-export function fetchMarketplaceListings(filters: MarketplaceFilters) {
-  return getJson<MarketplaceSearchResultDTO>(`/api/marketplace/listings?${marketplaceSearchParams(filters)}`);
+export function fetchMarketplaceOffers(filters: MarketplaceFilters) {
+  return getJson<MarketplaceSearchResultDTO>(`/api/marketplace/offers?${marketplaceSearchParams(filters)}`);
+}
+
+export function fetchMarketplaceOfferListings(offerId: string, page: number) {
+  return getJson<MarketplaceOfferListingsResultDTO>(`/api/marketplace/offers/${encodeURIComponent(offerId)}?page=${page}`);
 }
 
 export function fetchMarketplaceListing(listingId: string) {

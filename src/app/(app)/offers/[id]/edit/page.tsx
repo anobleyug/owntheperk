@@ -23,12 +23,12 @@ export default async function EditOfferPage({ params }: { params: Promise<{ id: 
     getOfferListingFormOptions(supabase, user.id),
   ]);
   if (!listing) notFound();
-  if (listing.verificationStatus !== "DRAFT" && listing.verificationStatus !== "NEEDS_REVIEW") redirect(`/offers/${id}`);
+  if (listing.verificationStatus !== "DRAFT" && listing.verificationStatus !== "NEEDS_REVIEW") redirect(`/offers/manage/${id}`);
   const action = updateOfferListingAction.bind(null, id);
 
   return (
     <div className="space-y-8">
-      <Link href={`/offers/${id}`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"><ArrowLeft aria-hidden="true" className="size-4" /> Listing details</Link>
+      <Link href={`/offers/manage/${id}`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"><ArrowLeft aria-hidden="true" className="size-4" /> Listing details</Link>
       <PageHeader eyebrow="Owner-only editing" title="Edit listing" description="Replace evidence or update marketplace terms while this listing remains editable." />
       <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
         <OfferListingForm action={action} cards={options.cards} merchants={options.merchants} offers={options.offers} listing={listing} />

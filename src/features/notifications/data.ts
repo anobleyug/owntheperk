@@ -54,7 +54,7 @@ export function notificationDestination(notification: NotificationDTO) {
   if (notification.relatedConversationId) return `/messages/${notification.relatedConversationId}`;
   if (!notification.relatedListingId) return null;
   if (notification.type === "LISTING_APPROVED" || notification.type === "LISTING_REJECTED") {
-    return `/offers/${notification.relatedListingId}`;
+    return `/offers/manage/${notification.relatedListingId}`;
   }
   return `/listings/${notification.relatedListingId}`;
 }

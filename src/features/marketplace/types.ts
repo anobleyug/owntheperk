@@ -5,11 +5,14 @@ export type MarketplaceSort = (typeof MARKETPLACE_SORTS)[number];
 
 export type MarketplaceListingDTO = {
   listingId: string;
+  offerId: string;
   merchantId: string;
   merchantName: string;
   merchantSlug: string;
   offerTitle: string;
   offerDescription: string;
+  publicIssuer: string | null;
+  publicCardProduct: string | null;
   rewardAmount: number;
   rewardType: RewardType;
   canonicalSpendRequirement: number;
@@ -20,12 +23,36 @@ export type MarketplaceListingDTO = {
   sellerRatingAverage: number;
   sellerRatingCount: number;
   sellerCompletedInteractionCount: number;
+  sellerResponseRate: number | null;
   verificationBadge: true;
   createdAt: string;
 };
 
+export type MarketplaceOfferDTO = {
+  offerId: string;
+  merchantId: string;
+  merchantName: string;
+  merchantSlug: string;
+  offerTitle: string;
+  offerDescription: string;
+  publicIssuer: string | null;
+  publicCardProduct: string | null;
+  rewardAmount: number;
+  rewardType: RewardType;
+  canonicalSpendRequirement: number;
+  expirationDate: string;
+  activeListingCount: number;
+  lowestAsk: number;
+  lowestMinSpend: number;
+  highestRating: number;
+  latestListingAt: string;
+};
+
 export type MarketplaceFilters = {
   q?: string;
+  issuer?: string;
+  cardProduct?: string;
+  maxRequiredSpend?: number;
   maxAsk?: number;
   maxMinSpend?: number;
   minReward?: number;
@@ -37,8 +64,16 @@ export type MarketplaceFilters = {
 };
 
 export type MarketplaceSearchResultDTO = {
+  offers: MarketplaceOfferDTO[];
+  total: number;
+  pageSize: number;
+};
+
+export type MarketplaceOfferListingsResultDTO = {
+  offer: MarketplaceOfferDTO;
   listings: MarketplaceListingDTO[];
   total: number;
+  page: number;
   pageSize: number;
 };
 

@@ -10,10 +10,9 @@ import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchMarketplaceListings, fetchMerchantSummaries, marketplaceSearchParams } from "../client";
-import { formatReward } from "../format";
+import { fetchMarketplaceOffers, fetchMerchantSummaries, marketplaceSearchParams } from "../client";
 import type { MarketplaceFilters } from "../types";
-import { ListingCard } from "./listing-card";
+import { GroupedOfferCard } from "./grouped-offer-card";
 
 const inputClass = "min-h-11 w-full rounded-2xl border border-input bg-background px-3.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/25";
 
@@ -30,9 +29,9 @@ function ResultsSkeleton() {
 export function MarketplaceSearch({ filters }: { filters: MarketplaceFilters }) {
   const router = useRouter();
   const filterKey = marketplaceSearchParams(filters).toString();
-  const listingsQuery = useQuery({
-    queryKey: ["public-marketplace-listings", filterKey],
-    queryFn: () => fetchMarketplaceListings(filters),
+  const offersQuery = useQuery({
+    queryKey: ["public-marketplace-offers", filterKey],
+    queryFn: () => fetchMarketplaceOffers(filters),
     placeholderData: keepPreviousData,
     staleTime: 30_000,
   });
@@ -42,14 +41,10 @@ export function MarketplaceSearch({ filters }: { filters: MarketplaceFilters }) 
     staleTime: 60_000,
   });
 
-  const result = listingsQuery.data;
-  const listings = result?.listings ?? [];
+  const result = offersQuery.data;
+  const offers = result?.offers ?? [];
   const total = result?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / (result?.pageSize ?? 12)));
-  const grouped = Map.groupBy(listings, (listing) => [
-    listing.merchantSlug, listing.offerTitle, listing.rewardType, listing.rewardAmount,
-    listing.canonicalSpendRequirement, listing.expirationDate,
-  ].join("|"));
 
   function submitFilters(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,7 +70,7 @@ export function MarketplaceSearch({ filters }: { filters: MarketplaceFilters }) 
   }
 
   return <div className="space-y-8">
-    <PageHeader eyebrow="Verified marketplace" title="Find an offer listing" description="Compare listings by Ask, Min Spend, OBO, expiration, and anonymous seller ratings." />
+    <PageHeader eyebrow="Verified marketplace" title="Find a shared card offer" description="Compare verified offer groups, then choose among eligible anonymous listings." />
 
     <form key={filterKey} onSubmit={submitFilters} className="rounded-3xl border border-border bg-card p-4 sm:p-6">
       <div className="flex items-center gap-2"><SlidersHorizontal aria-hidden="true" className="size-5 text-primary" /><h2 className="font-semibold">Search and filters</h2></div>
@@ -83,6 +78,15 @@ export function MarketplaceSearch({ filters }: { filters: MarketplaceFilters }) 
         <label className="space-y-1.5 text-xs font-semibold sm:col-span-2">Merchant
           <input name="q" type="search" defaultValue={filters.q} list="marketplace-merchants" placeholder="Adobe, Nike, Marriott…" className={inputClass} />
           <datalist id="marketplace-merchants">{merchantsQuery.data?.map((merchant) => <option key={merchant.id} value={merchant.name} />)}</datalist>
+        </label>
+        <label className="space-y-1.5 text-xs font-semibold">Issuer (public offers only)
+          <input name="issuer" defaultValue={filters.issuer} placeholder="Amex" className={inputClass} />
+        </label>
+        <label className="space-y-1.5 text-xs font-semibold">Card product (public only)
+          <input name="cardProduct" defaultValue={filters.cardProduct} placeholder="Platinum" className={inputClass} />
+        </label>
+        <label className="space-y-1.5 text-xs font-semibold">Maximum offer spend
+          <input name="maxRequiredSpend" type="number" min="0" step="0.01" defaultValue={filters.maxRequiredSpend} className={inputClass} />
         </label>
         <label className="space-y-1.5 text-xs font-semibold">Maximum ask
           <input name="maxAsk" type="number" min="0" step="0.01" defaultValue={filters.maxAsk} className={inputClass} />
@@ -115,25 +119,16 @@ export function MarketplaceSearch({ filters }: { filters: MarketplaceFilters }) 
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <button type="submit" className={buttonVariants()}><Search aria-hidden="true" /> Search marketplace</button>
         <Link href="/search" className={buttonVariants({ variant: "outline" })}>Clear filters</Link>
-        {listingsQuery.isFetching && result ? <span role="status" className="text-xs text-muted-foreground">Refreshing results…</span> : null}
+        {offersQuery.isFetching && result ? <span role="status" className="text-xs text-muted-foreground">Refreshing results…</span> : null}
       </div>
     </form>
 
-    {listingsQuery.isPending ? <ResultsSkeleton /> : listingsQuery.isError ?
+    {offersQuery.isPending ? <ResultsSkeleton /> : offersQuery.isError ?
       <EmptyState icon={Search} title="Marketplace unavailable" description="We could not refresh the marketplace. Please try again." /> : <>
-        <div className="flex items-center justify-between gap-4"><div><h2 className="text-lg font-semibold">{total} verified {total === 1 ? "listing" : "listings"}</h2><p className="mt-1 text-sm text-muted-foreground">Grouped by merchant and credit card offer.</p></div></div>
-        {listings.length ? <div className="space-y-8">
-          {Array.from(grouped.entries()).map(([groupKey, groupListings]) => {
-            const offer = groupListings[0]!;
-            return <section key={groupKey} className="space-y-3">
-              <div><p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{offer.merchantName}</p>
-                <h3 className="mt-1 text-lg font-semibold">{formatReward(offer)} · {offer.offerTitle}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{groupListings.length} seller {groupListings.length === 1 ? "listing" : "listings"} for this credit card offer</p>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{groupListings.map((listing) => <ListingCard key={listing.listingId} listing={listing} />)}</div>
-            </section>;
-          })}
-        </div> : <EmptyState icon={Search} title="No verified listings match" description="Try widening your filters or searching for another merchant." />}
+        <div className="flex items-center justify-between gap-4"><div><h2 className="text-lg font-semibold">{total} shared {total === 1 ? "offer" : "offers"}</h2><p className="mt-1 text-sm text-muted-foreground">Each result combines publicly eligible listings for one canonical offer.</p></div></div>
+        {offers.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {offers.map((offer) => <GroupedOfferCard key={offer.offerId} offer={offer} />)}
+        </div> : <EmptyState icon={Search} title="No verified offers match" description="Try widening your filters or searching for another merchant." />}
 
         {totalPages > 1 ? <nav aria-label="Marketplace result pages" className="flex items-center justify-center gap-3">
           {filters.page > 1 ? <Link href={pageHref(filters.page - 1)} className={buttonVariants({ variant: "outline" })}><ChevronLeft aria-hidden="true" /> Previous</Link> : null}

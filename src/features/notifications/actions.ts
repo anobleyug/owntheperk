@@ -60,7 +60,7 @@ export async function openNotificationAction(notificationId: string) {
   revalidatePath("/notifications");
   if (data.related_conversation_id) redirect(`/messages/${data.related_conversation_id}`);
   if (data.related_listing_id && ["LISTING_APPROVED", "LISTING_REJECTED"].includes(data.type)) {
-    redirect(`/offers/${data.related_listing_id}`);
+    redirect(`/offers/manage/${data.related_listing_id}`);
   }
   if (data.related_listing_id) redirect(`/listings/${data.related_listing_id}`);
   redirect("/notifications");

@@ -9,6 +9,9 @@ const optionalAmount = z.preprocess(
 
 export const marketplaceSearchSchema = z.object({
   q: z.string().trim().max(100).optional().transform((value) => value || undefined),
+  issuer: z.string().trim().max(80).optional().transform((value) => value || undefined),
+  cardProduct: z.string().trim().max(100).optional().transform((value) => value || undefined),
+  maxRequiredSpend: optionalAmount,
   maxAsk: optionalAmount,
   maxMinSpend: optionalAmount,
   minReward: optionalAmount,
@@ -30,6 +33,9 @@ export const marketplaceSearchSchema = z.object({
 export function parseMarketplaceFilters(input: Record<string, string | string[] | undefined>) {
   const parsed = marketplaceSearchSchema.safeParse({
     q: input.q,
+    issuer: input.issuer,
+    cardProduct: input.cardProduct,
+    maxRequiredSpend: input.maxRequiredSpend,
     maxAsk: input.maxAsk,
     maxMinSpend: input.maxMinSpend,
     minReward: input.minReward,
@@ -40,4 +46,8 @@ export function parseMarketplaceFilters(input: Record<string, string | string[] 
     page: input.page,
   });
   return parsed.success ? parsed.data : marketplaceSearchSchema.parse({});
+}
+
+export function parseOfferListingsPage(value: string | string[] | undefined) {
+  return z.coerce.number().int().min(1).catch(1).parse(Array.isArray(value) ? value[0] : value);
 }

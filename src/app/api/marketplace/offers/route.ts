@@ -12,6 +12,6 @@ export async function GET(request: Request) {
   try {
     return Response.json(await searchMarketplaceOffers(supabase, filters), { headers: publicMarketplaceCacheHeaders });
   } catch {
-    return Response.json({ error: "Unable to search marketplace listings." }, { status: 503, headers: privateNoStoreHeaders });
+    return Response.json({ error: "Unable to search marketplace offers." }, { status: 503, headers: privateNoStoreHeaders });
   }
 }

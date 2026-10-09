@@ -152,10 +152,10 @@ export async function createOfferListingAction(_state: FormState, formData: Form
   }
   if (intent === "submit") {
     revalidatePath("/offers");
-    redirect(`/offers/${listingId}?listingFee=required`);
+    redirect(`/offers/manage/${listingId}?listingFee=required`);
   }
   revalidatePath("/offers");
-  redirect(`/offers/${listingId}`);
+  redirect(`/offers/manage/${listingId}`);
 }
 
 export async function updateOfferListingAction(listingId: string, _state: FormState, formData: FormData): Promise<FormState> {
@@ -213,21 +213,21 @@ export async function updateOfferListingAction(listingId: string, _state: FormSt
       if (submissionError) return { status: "error", message: submissionError };
     } else {
       revalidatePath("/offers");
-      revalidatePath(`/offers/${listingId}`);
-      redirect(`/offers/${listingId}?listingFee=required`);
+      revalidatePath(`/offers/manage/${listingId}`);
+      redirect(`/offers/manage/${listingId}?listingFee=required`);
     }
   }
   revalidatePath("/offers");
-  revalidatePath(`/offers/${listingId}`);
-  redirect(`/offers/${listingId}`);
+  revalidatePath(`/offers/manage/${listingId}`);
+  redirect(`/offers/manage/${listingId}`);
 }
 
 export async function submitOfferListingAction(listingId: string) {
   if (!offerListingIdSchema.safeParse(listingId).success) redirect("/offers");
   const { supabase } = await authenticatedClient();
   const error = await submitListing(supabase, listingId);
-  if (error) redirect(`/offers/${listingId}?submission=error`);
+  if (error) redirect(`/offers/manage/${listingId}?submission=error`);
   revalidatePath("/offers");
-  revalidatePath(`/offers/${listingId}`);
-  redirect(`/offers/${listingId}?submission=success`);
+  revalidatePath(`/offers/manage/${listingId}`);
+  redirect(`/offers/manage/${listingId}?submission=success`);
 }
