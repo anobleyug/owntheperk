@@ -32,6 +32,7 @@ export type PrivateOfferListingDTO = {
   rewardAmount: number;
   rewardType: RewardType;
   expirationDate: string;
+  offerStatus: CanonicalOfferStatus;
   minSpend: number;
   askAmount: number | null;
   isObo: boolean;

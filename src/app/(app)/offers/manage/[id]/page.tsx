@@ -6,6 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { submitOfferListingAction } from "@/features/offers/actions";
 import { StatusBadge } from "@/features/offers/components/status-badge";
+import { ListingAvailabilityButton } from "@/features/offers/components/listing-availability-button";
 import { getPrivateOfferListing } from "@/features/offers/data";
 import { offerListingIdSchema } from "@/features/offers/schema";
 import { payListingSubmissionFeeAction } from "@/features/payments/actions";
@@ -28,6 +29,8 @@ export default async function ManagedOfferListingPage({ params, searchParams }: 
   const editable = listing.verificationStatus === "DRAFT" || listing.verificationStatus === "NEEDS_REVIEW";
   const submit = submitOfferListingAction.bind(null, listing.id);
   const payListingFee = payListingSubmissionFeeAction.bind(null, listing.id);
+  const canChangeAvailability = listing.verificationStatus === "VERIFIED" && (listing.listingStatus === "ACTIVE" || listing.listingStatus === "PAUSED");
+  const canResume = listing.offerStatus === "ACTIVE" && listing.expirationDate >= new Date().toISOString().slice(0, 10);
 
   return <div className="space-y-8">
     <Link href="/offers" className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"><ArrowLeft aria-hidden="true" className="size-4" /> My offers</Link>
@@ -60,6 +63,7 @@ export default async function ManagedOfferListingPage({ params, searchParams }: 
     </section>
     <section className="flex items-start gap-3 rounded-3xl border border-border bg-card p-5 sm:p-7"><WalletCards aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-primary" /><div><h2 className="font-semibold">Listing submission fee</h2><p className="mt-1 text-sm text-muted-foreground">{listing.listingFeeStatus === "SUCCEEDED" ? "Paid — this listing will not be charged again." : listing.listingFeeStatus === "PENDING" ? "Checkout started — $0.99 due before verification." : "$0.99 due once before this listing can enter verification."}</p></div></section>
     <div className="flex flex-col gap-3 sm:flex-row">
+      {canChangeAvailability ? <ListingAvailabilityButton listingId={listing.id} listingStatus={listing.listingStatus as "ACTIVE" | "PAUSED"} canResume={canResume} /> : null}
       {editable ? <Link href={`/offers/${listing.id}/edit`} className={buttonVariants({ variant: "outline", size: "lg" })}><Pencil aria-hidden="true" /> Edit listing</Link> : null}
       {editable && listing.listingFeeStatus === "SUCCEEDED" ? <form action={submit}><Button type="submit" size="lg" disabled={!listing.evidence || listing.askAmount === null}><Send aria-hidden="true" /> Submit for verification</Button></form> : null}
       {editable && listing.listingFeeStatus !== "SUCCEEDED" ? <form action={payListingFee}><Button type="submit" size="lg" disabled={!listing.evidence || listing.askAmount === null}><WalletCards aria-hidden="true" /> Pay $0.99 &amp; submit</Button></form> : null}

@@ -1,8 +1,9 @@
-import { BadgeCheck, Gauge, Star } from "lucide-react";
+import { BadgeCheck, Star } from "lucide-react";
 import Link from "next/link";
 
 import { formatMoney } from "@/features/marketplace/format";
 import type { MarketplaceListingDTO } from "@/features/marketplace/types";
+import { SellerSignals } from "./seller-signals";
 
 export function ListingCard({ listing }: { listing: MarketplaceListingDTO }) {
   return <Link href={"/listings/" + listing.listingId} className="block min-w-0 rounded-3xl border border-border bg-card p-4 shadow-[0_18px_55px_-44px_rgba(16,48,51,0.6)] transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:p-5">
@@ -19,8 +20,8 @@ export function ListingCard({ listing }: { listing: MarketplaceListingDTO }) {
     </div>
     <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
       <span className="inline-flex items-center gap-1 font-semibold text-primary"><BadgeCheck aria-hidden="true" className="size-4" /> Listing verified</span>
-      {listing.sellerResponseRate !== null ? <span className="inline-flex items-center gap-1 text-muted-foreground"><Gauge aria-hidden="true" className="size-3.5" /> {listing.sellerResponseRate.toFixed(0)}% response rate</span> : null}
     </div>
+    <div className="mt-3"><SellerSignals listing={listing} /></div>
     <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4 text-sm min-[390px]:flex-row min-[390px]:items-center min-[390px]:justify-between">
       <span className="font-semibold">Seller Rating</span>
       <span className="inline-flex items-center gap-1 text-muted-foreground"><Star aria-hidden="true" className="size-4 shrink-0 fill-current text-[#b98224]" /> {listing.sellerRatingCount ? listing.sellerRatingAverage.toFixed(1) : "New"} <span className="text-xs">· {listing.sellerRatingCount} reviews · {listing.sellerCompletedInteractionCount} completed</span></span>

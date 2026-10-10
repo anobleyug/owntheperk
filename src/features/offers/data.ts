@@ -69,6 +69,7 @@ export async function getPrivateOfferListings(supabase: SupabaseClient, userId: 
       id: listing.id, offerId: listing.offer_id, cardId: listing.card_id, merchantId: offer.merchant_id,
       title: offer.title, description: offer.description, requiredSpend: Number(offer.required_spend),
       rewardAmount: Number(offer.reward_amount), rewardType: offer.reward_type, expirationDate: offer.expiration_date,
+      offerStatus: offer.status,
       minSpend: Number(listing.min_spend), askAmount: listing.ask_amount === null ? null : Number(listing.ask_amount),
       isObo: listing.is_obo, verificationStatus: listing.verification_status,
       verificationTimestamp: listing.verification_timestamp, listingStatus: listing.listing_status,

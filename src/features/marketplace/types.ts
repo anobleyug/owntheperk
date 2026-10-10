@@ -24,6 +24,9 @@ export type MarketplaceListingDTO = {
   sellerRatingCount: number;
   sellerCompletedInteractionCount: number;
   sellerResponseRate: number | null;
+  sellerResponseBucket: "WITHIN_ONE_HOUR" | "WITHIN_FEW_HOURS" | "WITHIN_ONE_DAY" | "OVER_ONE_DAY" | null;
+  sellerActivityStatus: "ACTIVE_NOW" | "ACTIVE_TODAY" | null;
+  sellerAvailabilityStatus: "AVAILABLE" | "TEMPORARILY_UNAVAILABLE";
   verificationBadge: true;
   createdAt: string;
 };

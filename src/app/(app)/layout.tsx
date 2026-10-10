@@ -31,6 +31,7 @@ export default async function AuthenticatedAppLayout({
     getOwnProfile(supabase, user.id),
     supabase.rpc("current_account_is_active"),
     getUnreadNotificationCount(supabase),
+    supabase.rpc("touch_user_activity"),
   ]);
   if (accountResult.data === false) redirect("/account-suspended");
   if (!profile?.onboardingCompleted) redirect("/onboarding");

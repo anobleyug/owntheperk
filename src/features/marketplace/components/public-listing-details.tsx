@@ -7,6 +7,7 @@ import { fetchMarketplaceListing } from "../client";
 import { formatExpiration, formatMoney, formatReward } from "../format";
 import type { MarketplaceListingDTO } from "../types";
 import { SaveOfferButton } from "@/features/saved-offers/components/save-offer-button";
+import { SellerSignals } from "./seller-signals";
 
 export function PublicListingDetails({ initialListing, initiallySaved }: { initialListing: MarketplaceListingDTO; initiallySaved: boolean }) {
   const { data: listing, isFetching } = useQuery({
@@ -42,6 +43,7 @@ export function PublicListingDetails({ initialListing, initiallySaved }: { initi
         <span className="grid size-12 place-items-center rounded-full bg-brand-ink text-primary-foreground"><UserRound aria-hidden="true" className="size-5" /></span>
         <div><p className="font-semibold">Seller Rating</p>
           <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground"><span className="inline-flex items-center gap-1"><Star aria-hidden="true" className="size-3.5 fill-current text-[#b98224]" /> {listing.sellerRatingAverage.toFixed(1)} ({listing.sellerRatingCount})</span><span className="inline-flex items-center gap-1"><MessageCircle aria-hidden="true" className="size-3.5" /> {listing.sellerCompletedInteractionCount} interactions</span></p>
+          <div className="mt-2"><SellerSignals listing={listing} /></div>
         </div>
       </div>
     </section>

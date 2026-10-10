@@ -17,6 +17,10 @@ describe("public marketplace field allowlist", () => {
       "seller_rating_average",
       "seller_rating_count",
       "seller_completed_interaction_count",
+      "seller_response_rate",
+      "seller_response_bucket",
+      "seller_activity_status",
+      "seller_availability_status",
       "verification_badge",
     ]));
   });
@@ -29,6 +33,9 @@ describe("public marketplace field allowlist", () => {
       "seller_notes",
       "reviewer_id",
       "verification_timestamp",
+      "last_active_at",
+      "median_response_seconds",
+      "response_sample_count",
     ]));
   });
 });

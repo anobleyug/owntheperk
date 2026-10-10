@@ -2,6 +2,7 @@ import { CalendarDays, CreditCard } from "lucide-react";
 import Link from "next/link";
 
 import { StatusBadge } from "@/features/offers/components/status-badge";
+import { ListingAvailabilityButton } from "@/features/offers/components/listing-availability-button";
 import type { PrivateOfferListingDTO } from "@/features/offers/types";
 
 function rewardLabel(listing: PrivateOfferListingDTO) {
@@ -12,7 +13,10 @@ function rewardLabel(listing: PrivateOfferListingDTO) {
 }
 
 export function PrivateOfferListingCard({ listing }: { listing: PrivateOfferListingDTO }) {
-  return <Link href={"/offers/manage/" + listing.id} className="block rounded-3xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
+  const canChangeAvailability = listing.verificationStatus === "VERIFIED" && (listing.listingStatus === "ACTIVE" || listing.listingStatus === "PAUSED");
+  const canResume = listing.offerStatus === "ACTIVE" && listing.expirationDate >= new Date().toISOString().slice(0, 10);
+  return <article className="rounded-3xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+    <Link href={"/offers/manage/" + listing.id} className="block rounded-2xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
     <div className="flex items-start justify-between gap-4"><div>
       <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase">{listing.merchantName}</p>
       <h3 className="mt-2 font-semibold leading-6">{listing.title}</h3>
@@ -26,5 +30,8 @@ export function PrivateOfferListingCard({ listing }: { listing: PrivateOfferList
       <span className="inline-flex items-center gap-1.5"><CreditCard aria-hidden="true" className="size-3.5" />{listing.cardNickname}</span>
       <span className="inline-flex items-center gap-1.5"><CalendarDays aria-hidden="true" className="size-3.5" />Expires {listing.expirationDate}</span>
     </div>
-  </Link>;
+    </Link>
+    {listing.listingStatus === "PAUSED" ? <p className="mt-4 rounded-xl bg-muted px-3 py-2 text-xs font-semibold text-muted-foreground">Temporarily unavailable</p> : null}
+    {canChangeAvailability ? <div className="mt-4 border-t border-border pt-4"><ListingAvailabilityButton listingId={listing.id} listingStatus={listing.listingStatus as "ACTIVE" | "PAUSED"} canResume={canResume} /></div> : null}
+  </article>;
 }

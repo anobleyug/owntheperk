@@ -22,6 +22,9 @@ type MarketplaceRow = {
   is_obo: boolean; expiration_date: string;
   seller_rating_average: number | string; seller_rating_count: number;
   seller_completed_interaction_count: number; seller_response_rate: number | string | null;
+  seller_response_bucket: MarketplaceListingDTO["sellerResponseBucket"];
+  seller_activity_status: MarketplaceListingDTO["sellerActivityStatus"];
+  seller_availability_status: MarketplaceListingDTO["sellerAvailabilityStatus"];
   verification_badge: true; created_at: string;
 };
 
@@ -57,6 +60,9 @@ function mapMarketplaceRow(row: MarketplaceRow): MarketplaceListingDTO {
     sellerRatingCount: row.seller_rating_count,
     sellerCompletedInteractionCount: row.seller_completed_interaction_count,
     sellerResponseRate: row.seller_response_rate === null ? null : Number(row.seller_response_rate),
+    sellerResponseBucket: row.seller_response_bucket,
+    sellerActivityStatus: row.seller_activity_status,
+    sellerAvailabilityStatus: row.seller_availability_status,
     verificationBadge: true,
     createdAt: row.created_at,
   };

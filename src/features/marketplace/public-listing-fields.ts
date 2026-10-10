@@ -19,8 +19,11 @@ export const PUBLIC_MARKETPLACE_FIELDS = [
   "seller_rating_count",
   "seller_completed_interaction_count",
   "seller_response_rate",
+  "seller_response_bucket",
+  "seller_activity_status",
+  "seller_availability_status",
   "verification_badge",
   "created_at",
 ] as const;
 
-export const MARKETPLACE_COLUMNS = "listing_id, offer_id, merchant_id, merchant_name, merchant_slug, offer_title, offer_description, public_issuer, public_card_product, reward_amount, reward_type, canonical_spend_requirement, min_spend, ask_amount, is_obo, expiration_date, seller_rating_average, seller_rating_count, seller_completed_interaction_count, seller_response_rate, verification_badge, created_at" as const;
+export const MARKETPLACE_COLUMNS = "listing_id, offer_id, merchant_id, merchant_name, merchant_slug, offer_title, offer_description, public_issuer, public_card_product, reward_amount, reward_type, canonical_spend_requirement, min_spend, ask_amount, is_obo, expiration_date, seller_rating_average, seller_rating_count, seller_completed_interaction_count, seller_response_rate, seller_response_bucket, seller_activity_status, seller_availability_status, verification_badge, created_at" as const;

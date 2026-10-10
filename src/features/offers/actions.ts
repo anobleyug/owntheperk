@@ -231,3 +231,50 @@ export async function submitOfferListingAction(listingId: string) {
   revalidatePath(`/offers/manage/${listingId}`);
   redirect(`/offers/manage/${listingId}?submission=success`);
 }
+
+export type ListingAvailabilityState = {
+  status: "idle" | "success" | "error";
+  listingStatus: "ACTIVE" | "PAUSED";
+  message?: string;
+};
+
+export async function setOfferListingAvailabilityAction(
+  listingId: string,
+  previousState: ListingAvailabilityState,
+  formData: FormData,
+): Promise<ListingAvailabilityState> {
+  if (!offerListingIdSchema.safeParse(listingId).success) {
+    return { ...previousState, status: "error", message: "Invalid listing." };
+  }
+  const intent = formData.get("intent");
+  if (intent !== "pause" && intent !== "resume") {
+    return { ...previousState, status: "error", message: "Invalid availability change." };
+  }
+
+  const { supabase, user } = await authenticatedClient();
+  const { data: listing } = await supabase.from("offer_listings")
+    .select("offer_id").eq("id", listingId).eq("user_id", user.id)
+    .maybeSingle<{ offer_id: string }>();
+  if (!listing) return { ...previousState, status: "error", message: "Listing not found." };
+
+  const { data, error } = await supabase.rpc("set_offer_listing_availability", {
+    target_listing_id: listingId,
+    target_paused: intent === "pause",
+  });
+  if (error || (data !== "ACTIVE" && data !== "PAUSED")) {
+    return { ...previousState, status: "error", message: intent === "pause"
+      ? "This listing could not be paused."
+      : "This listing can no longer be resumed." };
+  }
+
+  revalidatePath("/offers");
+  revalidatePath(`/offers/manage/${listingId}`);
+  revalidatePath(`/offers/${listing.offer_id}`);
+  revalidatePath(`/listings/${listingId}`);
+  revalidatePath("/search");
+  return {
+    status: "success",
+    listingStatus: data,
+    message: data === "PAUSED" ? "Listing paused and removed from the marketplace." : "Listing resumed and visible in the marketplace.",
+  };
+}

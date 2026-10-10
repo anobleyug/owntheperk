@@ -2029,6 +2029,145 @@ Recommended order:
 
 19\\. Mobile/PWA polish
 
+
+## Latest Product Requirements
+
+### Group Marketplace Search by Parent Offer
+
+Marketplace search should show one result per shared/parent `offer`, not one result per individual `offer_listing`.
+
+Example:
+
+```text
+Adobe
+Spend $250 → Get $100 Back
+Amex Platinum
+
+10 listings available
+From $180 ask
+
+View Listings
+```
+
+Requirements:
+
+- group search results by `offer_id`
+- show active verified listing count
+- show safe aggregate values such as lowest Ask
+- clicking a result opens `/offers/[offerId]`
+- that page lists all eligible child listings
+- paginate child listings at 50 per page
+- only include listings that are `ACTIVE + VERIFIED` and not expired
+- do not expose seller username/avatar before chat unlock
+- avoid N+1 queries
+
+### Saved Offers
+
+Users can save/unsave parent offers.
+
+Use a model like:
+
+```text
+saved_offers
+- id
+- user_id
+- offer_id
+- created_at
+```
+
+Requirements:
+
+- unique `(user_id, offer_id)`
+- user may only read/create/delete their own saved offers
+- Save/Saved control on grouped search cards and offer detail pages
+- Saved section available through `Profile → Saved`
+
+Saved view should show:
+
+- merchant
+- offer benefit
+- spend requirement
+- expiration
+- current active listing count
+- lowest current Ask
+- View Listings
+- Remove Saved
+
+If no active listings exist, keep the saved offer visible and show:
+
+`No listings available right now`
+
+### Saved Offer Alerts
+
+Users should receive in-app notifications for saved parent offers when:
+
+1. a new `ACTIVE + VERIFIED` listing is posted
+2. a lower Ask appears than the previous lowest active Ask
+3. the parent offer is within 7 days of expiration
+4. the parent offer expires or becomes inactive
+5. all active listings for the saved offer become unavailable/closed
+
+Requirements:
+
+- reuse the existing notifications system
+- prevent duplicate notifications with an idempotent event key
+- use a daily scheduled job for expiration alerts
+- unsaving an offer stops future alerts
+- in-app notifications only for MVP
+- no email, SMS, or push yet
+- notification payloads must not expose seller identity, card data, or verification evidence
+
+### Seller Availability and Response Signals
+
+Show lightweight public-safe seller signals where appropriate:
+
+- `Usually responds within 1 hour`
+- `Usually responds within a few hours`
+- `Usually responds within a day`
+- `Active today`
+- `Temporarily unavailable`
+- `95% response rate`
+
+These signals may be shown before chat unlock because they are reputation/activity aggregates, but seller username/avatar must remain hidden.
+
+Recommended seller statistics:
+
+```text
+last_active_at
+response_rate
+median_response_seconds or response_bucket
+availability_status
+```
+
+Availability statuses:
+
+```text
+AVAILABLE
+TEMPORARILY_UNAVAILABLE
+```
+
+Rules:
+
+- derive activity from meaningful authenticated actions
+- do not expose exact last-login timestamps
+- derive response rate from eligible unlocked conversations
+- do not count spam, blocked conversations, conversations without a buyer message, or self/test flows
+- derive typical response time from historical first-response times
+- require a minimum sample size before showing response metrics
+- do not expose underlying private message/conversation data
+
+### Pause / Resume Listings
+
+Sellers must be able to quickly pause or resume their own listings from My Offers / listing management.
+
+Actions:
+
+```text
+Pause Listing
+
+
+
 Do not attempt to implement every future feature at once.
 
 Before generating large amounts of code, inspect the existing repository and reuse existing architecture, components, conventions, and dependencies whenever appropriate.
+
