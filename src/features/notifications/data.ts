@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { NotificationDTO, NotificationType } from "./types";
 
-const NOTIFICATION_COLUMNS = "id, type, title, body, related_listing_id, related_conversation_id, read_at, created_at";
+const NOTIFICATION_COLUMNS = "id, type, title, body, related_listing_id, related_conversation_id, offer_id, read_at, created_at";
 
 type NotificationRow = {
   id: string;
@@ -13,6 +13,7 @@ type NotificationRow = {
   body: string;
   related_listing_id: string | null;
   related_conversation_id: string | null;
+  offer_id: string | null;
   read_at: string | null;
   created_at: string;
 };
@@ -28,6 +29,7 @@ export async function getNotifications(supabase: SupabaseClient): Promise<Notifi
     body: row.body,
     relatedListingId: row.related_listing_id,
     relatedConversationId: row.related_conversation_id,
+    offerId: row.offer_id,
     readAt: row.read_at,
     createdAt: row.created_at,
   }));
@@ -52,6 +54,9 @@ export async function isMerchantFollowed(
 
 export function notificationDestination(notification: NotificationDTO) {
   if (notification.relatedConversationId) return `/messages/${notification.relatedConversationId}`;
+  if (["SAVED_OFFER_EXPIRING_SOON", "SAVED_OFFER_NO_LISTINGS", "SAVED_OFFER_UNAVAILABLE"].includes(notification.type)) {
+    return "/profile/saved";
+  }
   if (!notification.relatedListingId) return null;
   if (notification.type === "LISTING_APPROVED" || notification.type === "LISTING_REJECTED") {
     return `/offers/manage/${notification.relatedListingId}`;

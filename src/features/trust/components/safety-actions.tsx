@@ -3,7 +3,7 @@
 import { Flag, ShieldBan } from "lucide-react";
 import { useActionState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { blockUserAction, submitReportAction } from "../actions";
 import { REPORT_REASONS, type TrustActionState } from "../types";
 
@@ -37,14 +37,14 @@ export function SafetyActions({
   return <section className="rounded-3xl border border-border bg-card p-4 sm:p-5">
     <h2 className="font-semibold">Safety</h2>
     <div className="mt-3 flex flex-wrap gap-2">
-      <form action={blockAction}>
+      <form action={blockAction} className="w-36">
         {targetUserId ? <input type="hidden" name="targetUserId" value={targetUserId} /> : null}
         <input type="hidden" name="offerListingId" value={offerListingId ?? ""} />
-        <Button type="submit" variant="outline" disabled={blocking || blocked}><ShieldBan aria-hidden="true" /> {blocked ? "Blocked" : blocking ? "Blocking…" : "Block User"}</Button>
+        <Button type="submit" variant="outline" className="w-full" disabled={blocking || blocked}><ShieldBan aria-hidden="true" /> {blocked ? "Blocked" : blocking ? "Blocking…" : "Block User"}</Button>
       </form>
-      {canReport && <details className="w-full rounded-2xl border border-border p-3 sm:w-auto sm:min-w-80">
-        <summary className="flex min-h-8 cursor-pointer list-none items-center gap-2 text-sm font-semibold"><Flag aria-hidden="true" className="size-4" /> Report</summary>
-        <form action={reportAction} className="mt-4 space-y-3">
+      {canReport && <details className="w-36 open:w-full sm:open:w-80">
+        <summary className={buttonVariants({ variant: "outline", className: "w-36 cursor-pointer list-none [&::-webkit-details-marker]:hidden" })}><Flag aria-hidden="true" /> Report</summary>
+        <form action={reportAction} className="mt-3 space-y-3 rounded-2xl border border-border p-3">
           {targetUserId ? <input type="hidden" name="reportedUserId" value={targetUserId} /> : null}
           <input type="hidden" name="conversationId" value={conversationId ?? ""} />
           <input type="hidden" name="offerListingId" value={offerListingId ?? ""} />

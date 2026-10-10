@@ -49,16 +49,20 @@ export async function openNotificationAction(notificationId: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const { data } = await supabase.from("notifications")
-    .select("type, related_listing_id, related_conversation_id")
+    .select("type, related_listing_id, related_conversation_id, offer_id")
     .eq("id", notificationId).maybeSingle<{
       type: NotificationType;
       related_listing_id: string | null;
       related_conversation_id: string | null;
+      offer_id: string | null;
     }>();
   if (!data) redirect("/notifications");
   await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("id", notificationId);
   revalidatePath("/notifications");
   if (data.related_conversation_id) redirect(`/messages/${data.related_conversation_id}`);
+  if (["SAVED_OFFER_EXPIRING_SOON", "SAVED_OFFER_NO_LISTINGS", "SAVED_OFFER_UNAVAILABLE"].includes(data.type)) {
+    redirect("/profile/saved");
+  }
   if (data.related_listing_id && ["LISTING_APPROVED", "LISTING_REJECTED"].includes(data.type)) {
     redirect(`/offers/manage/${data.related_listing_id}`);
   }

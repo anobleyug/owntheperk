@@ -43,7 +43,7 @@ select ok(not has_table_privilege('authenticated', 'public.notifications', 'INSE
 select ok(not has_column_privilege('authenticated', 'public.notifications', 'body', 'UPDATE'), 'users cannot alter notification content');
 select is(
   (select array_agg(column_name order by ordinal_position)::text from information_schema.columns where table_schema = 'public' and table_name = 'notifications'),
-  '{id,user_id,type,title,body,related_listing_id,related_conversation_id,read_at,created_at}',
+  '{id,user_id,type,title,body,related_listing_id,related_conversation_id,read_at,created_at,offer_id,event_key}',
   'notification table contains only intended fields'
 );
 

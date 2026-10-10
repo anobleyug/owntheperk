@@ -1,4 +1,4 @@
-import { Bookmark } from "lucide-react";
+import { Bell, Bookmark } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -19,7 +19,7 @@ export default async function SavedOffersPage() {
   const today = new Date().toISOString().slice(0, 10);
 
   return <div className="space-y-8">
-    <PageHeader eyebrow="Your marketplace profile" title="Saved offers" description="Keep shared offers handy, even when no verified listings are currently available." />
+    <PageHeader eyebrow="Your marketplace profile" title="Saved offers" description="Keep shared offers handy and receive in-app alerts when listings, pricing, or availability changes." />
     <ProfileTabs active="saved" />
 
     {offers.length ? <div className="grid gap-4 md:grid-cols-2">
@@ -32,7 +32,10 @@ export default async function SavedOffersPage() {
               <p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{offer.merchantName}</p>
               <h2 className="mt-2 text-lg font-semibold">{offer.offerTitle}</h2>
             </div>
-            {(expired || inactive) && <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">{expired ? "Expired" : "Inactive"}</span>}
+            <div className="flex shrink-0 flex-col items-end gap-2">
+              {(expired || inactive) && <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">{expired ? "Expired" : "Inactive"}</span>}
+              <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold text-primary"><Bell aria-hidden="true" className="size-3" /> Alerts on</span>
+            </div>
           </div>
 
           <p className="mt-3 text-sm font-semibold">Spend {formatMoney(offer.canonicalSpendRequirement)} → Get {formatReward(offer)}</p>

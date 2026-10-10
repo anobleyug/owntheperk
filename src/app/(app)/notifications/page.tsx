@@ -1,4 +1,4 @@
-import { BadgeCheck, Bell, Flag, MessageSquareText, Star, Store } from "lucide-react";
+import { BadgeCheck, Bell, Bookmark, CircleDollarSign, Flag, MessageSquareText, Star, Store } from "lucide-react";
 import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/empty-state";
@@ -21,6 +21,11 @@ const typeIcons: Record<NotificationType, typeof Bell> = {
   MERCHANT_LISTING: Store,
   REPORT_RESOLVED: Flag,
   REPORT_DISMISSED: Flag,
+  SAVED_OFFER_NEW_LISTING: Bookmark,
+  SAVED_OFFER_LOWER_ASK: CircleDollarSign,
+  SAVED_OFFER_EXPIRING_SOON: Bell,
+  SAVED_OFFER_NO_LISTINGS: Bookmark,
+  SAVED_OFFER_UNAVAILABLE: Bookmark,
 };
 
 export default async function NotificationsPage() {
@@ -29,10 +34,10 @@ export default async function NotificationsPage() {
   const hasUnread = notifications.some((notification) => !notification.readAt);
   return <div className="space-y-8">
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <PageHeader eyebrow="In-app activity" title="Notifications" description="Messages, listing decisions, ratings, moderation outcomes, and alerts from merchants you follow." />
+      <PageHeader eyebrow="In-app activity" title="Notifications" description="Messages, listing decisions, ratings, moderation outcomes, and alerts for merchants and offers you save." />
       {hasUnread && <form action={markAllNotificationsReadAction}><Button type="submit" variant="outline" className="w-full sm:w-auto">Mark all read</Button></form>}
     </div>
-    {notifications.length === 0 ? <EmptyState icon={Bell} title="No notifications yet" description="Marketplace activity and saved merchant alerts will appear here." /> : <div className="space-y-3">{notifications.map((notification) => {
+    {notifications.length === 0 ? <EmptyState icon={Bell} title="No notifications yet" description="Marketplace activity and saved offer alerts will appear here." /> : <div className="space-y-3">{notifications.map((notification) => {
       const Icon = typeIcons[notification.type];
       const destination = notificationDestination(notification);
       const openAction = openNotificationAction.bind(null, notification.id);

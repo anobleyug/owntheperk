@@ -6,7 +6,12 @@ export type NotificationType =
   | "NEW_RATING"
   | "MERCHANT_LISTING"
   | "REPORT_RESOLVED"
-  | "REPORT_DISMISSED";
+  | "REPORT_DISMISSED"
+  | "SAVED_OFFER_NEW_LISTING"
+  | "SAVED_OFFER_LOWER_ASK"
+  | "SAVED_OFFER_EXPIRING_SOON"
+  | "SAVED_OFFER_NO_LISTINGS"
+  | "SAVED_OFFER_UNAVAILABLE";
 
 export type NotificationDTO = {
   id: string;
@@ -15,6 +20,7 @@ export type NotificationDTO = {
   body: string;
   relatedListingId: string | null;
   relatedConversationId: string | null;
+  offerId: string | null;
   readAt: string | null;
   createdAt: string;
 };
