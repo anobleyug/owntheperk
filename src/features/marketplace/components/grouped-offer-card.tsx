@@ -4,8 +4,9 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { formatExpiration, formatMoney, formatReward } from "@/features/marketplace/format";
 import type { MarketplaceOfferDTO } from "@/features/marketplace/types";
+import { SaveOfferButton } from "@/features/saved-offers/components/save-offer-button";
 
-export function GroupedOfferCard({ offer }: { offer: MarketplaceOfferDTO }) {
+export function GroupedOfferCard({ offer, initiallySaved }: { offer: MarketplaceOfferDTO; initiallySaved: boolean }) {
   const publicCard = [offer.publicIssuer, offer.publicCardProduct].filter(Boolean).join(" ");
 
   return <article className="rounded-3xl border border-border bg-card p-5 shadow-[0_18px_55px_-44px_rgba(16,48,51,0.6)] sm:p-6">
@@ -16,7 +17,10 @@ export function GroupedOfferCard({ offer }: { offer: MarketplaceOfferDTO }) {
         <p className="mt-1 text-sm text-muted-foreground">{offer.offerTitle}</p>
         {publicCard ? <p className="mt-2 text-sm font-medium">{publicCard}</p> : null}
       </div>
-      <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-secondary text-base font-bold text-primary">{offer.merchantName.slice(0, 1)}</span>
+      <div className="flex shrink-0 flex-col items-end gap-2">
+        <span className="grid size-11 place-items-center rounded-2xl bg-secondary text-base font-bold text-primary">{offer.merchantName.slice(0, 1)}</span>
+        <SaveOfferButton key={`${offer.offerId}-${initiallySaved}`} offerId={offer.offerId} initiallySaved={initiallySaved} compact />
+      </div>
     </div>
 
     <div className="mt-5 grid grid-cols-2 gap-3">

@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchMarketplaceOffers, fetchMerchantSummaries, marketplaceSearchParams } from "../client";
+import { fetchSavedOfferIds } from "@/features/saved-offers/client";
 import type { MarketplaceFilters } from "../types";
 import { GroupedOfferCard } from "./grouped-offer-card";
 
@@ -39,6 +40,11 @@ export function MarketplaceSearch({ filters }: { filters: MarketplaceFilters }) 
     queryKey: ["public-marketplace-merchants"],
     queryFn: fetchMerchantSummaries,
     staleTime: 60_000,
+  });
+  const savedOffersQuery = useQuery({
+    queryKey: ["saved-offer-ids"],
+    queryFn: fetchSavedOfferIds,
+    staleTime: 30_000,
   });
 
   const result = offersQuery.data;
@@ -127,7 +133,7 @@ export function MarketplaceSearch({ filters }: { filters: MarketplaceFilters }) 
       <EmptyState icon={Search} title="Marketplace unavailable" description="We could not refresh the marketplace. Please try again." /> : <>
         <div className="flex items-center justify-between gap-4"><div><h2 className="text-lg font-semibold">{total} shared {total === 1 ? "offer" : "offers"}</h2><p className="mt-1 text-sm text-muted-foreground">Each result combines publicly eligible listings for one canonical offer.</p></div></div>
         {offers.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {offers.map((offer) => <GroupedOfferCard key={offer.offerId} offer={offer} />)}
+          {offers.map((offer) => <GroupedOfferCard key={offer.offerId} offer={offer} initiallySaved={savedOffersQuery.data?.includes(offer.offerId) ?? false} />)}
         </div> : <EmptyState icon={Search} title="No verified offers match" description="Try widening your filters or searching for another merchant." />}
 
         {totalPages > 1 ? <nav aria-label="Marketplace result pages" className="flex items-center justify-center gap-3">

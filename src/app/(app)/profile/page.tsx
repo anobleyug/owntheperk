@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/features/auth/actions";
 import { updateProfileAction } from "@/features/profiles/actions";
 import { ProfileForm } from "@/features/profiles/components/profile-form";
+import { ProfileTabs } from "@/features/profiles/components/profile-tabs";
 import { getOwnProfile } from "@/features/profiles/data";
 import { createClient } from "@/lib/supabase/server";
 
@@ -47,6 +48,7 @@ export default async function ProfilePage() {
         title="Your profile"
         description="Choose what other members can see after you connect. Your personal details always stay private."
       />
+      <ProfileTabs active="profile" />
 
       <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
         <div className="h-24 bg-[linear-gradient(120deg,#c9e8db,#eadcae)]" />

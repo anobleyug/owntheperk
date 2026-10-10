@@ -9,6 +9,7 @@ import { offerListingIdSchema } from "@/features/offers/schema";
 import { unlockChatAction } from "@/features/payments/actions";
 import { MerchantFollowButton } from "@/features/notifications/components/merchant-follow-button";
 import { isMerchantFollowed } from "@/features/notifications/data";
+import { isOfferSaved } from "@/features/saved-offers/data";
 import { SafetyActions } from "@/features/trust/components/safety-actions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,12 +30,15 @@ export default async function MarketplaceListingPage({ params, searchParams }: {
   const isOwner = Boolean(ownListingResult.data);
   const conversation = conversationResult.data;
   const unlocked = conversation && conversation.status !== "LOCKED";
-  const merchantFollowed = user ? await isMerchantFollowed(supabase, user.id, listing.merchantId) : false;
+  const [merchantFollowed, offerSaved] = user ? await Promise.all([
+    isMerchantFollowed(supabase, user.id, listing.merchantId),
+    isOfferSaved(supabase, user.id, listing.offerId),
+  ]) : [false, false];
   const checkoutAction = unlockChatAction.bind(null, id);
 
   return <div className="mx-auto max-w-4xl space-y-6">
     <Link href="/search" className="inline-flex min-h-10 items-center text-sm font-semibold text-muted-foreground hover:text-foreground">← Back to marketplace</Link>
-    <PublicListingDetails initialListing={listing} />
+    <PublicListingDetails initialListing={listing} initiallySaved={offerSaved} />
 
     <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
       <div><h2 className="font-semibold">Save {listing.merchantName}</h2><p className="mt-1 text-sm text-muted-foreground">Get an in-app alert when another verified listing becomes available.</p></div>

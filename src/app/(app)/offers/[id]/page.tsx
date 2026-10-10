@@ -10,6 +10,8 @@ import { formatExpiration, formatMoney, formatReward } from "@/features/marketpl
 import { parseOfferListingsPage } from "@/features/marketplace/schema";
 import { offerListingIdSchema } from "@/features/offers/schema";
 import { createClient } from "@/lib/supabase/server";
+import { isOfferSaved } from "@/features/saved-offers/data";
+import { SaveOfferButton } from "@/features/saved-offers/components/save-offer-button";
 
 export const metadata: Metadata = { title: "Verified offer listings" };
 
@@ -21,7 +23,11 @@ export default async function MarketplaceOfferPage({ params, searchParams }: {
   if (!offerListingIdSchema.safeParse(id).success) notFound();
   const page = parseOfferListingsPage((await searchParams).page);
   const supabase = await createClient();
-  const result = await getMarketplaceOfferListings(supabase, id, page);
+  const { data: { user } } = await supabase.auth.getUser();
+  const [result, offerSaved] = await Promise.all([
+    getMarketplaceOfferListings(supabase, id, page),
+    user ? isOfferSaved(supabase, user.id, id) : false,
+  ]);
   if (!result) notFound();
   const { offer, listings, total, pageSize } = result;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -31,7 +37,10 @@ export default async function MarketplaceOfferPage({ params, searchParams }: {
   return <div className="space-y-8">
     <Link href="/search" className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"><ChevronLeft aria-hidden="true" className="size-4" /> Back to search</Link>
     <section className="rounded-3xl border border-border bg-card p-5 sm:p-8">
-      <p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{offer.merchantName}</p>
+      <div className="flex items-start justify-between gap-4">
+        <p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">{offer.merchantName}</p>
+        <SaveOfferButton offerId={offer.offerId} initiallySaved={offerSaved} />
+      </div>
       <h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em]">Spend {formatMoney(offer.canonicalSpendRequirement)} → Get {formatReward(offer)}</h1>
       <p className="mt-2 text-lg font-medium">{offer.offerTitle}</p>
       {publicCard ? <p className="mt-2 text-sm font-semibold">{publicCard}</p> : null}

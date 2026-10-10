@@ -6,8 +6,9 @@ import { BadgeCheck, CalendarDays, MessageCircle, Star, UserRound } from "lucide
 import { fetchMarketplaceListing } from "../client";
 import { formatExpiration, formatMoney, formatReward } from "../format";
 import type { MarketplaceListingDTO } from "../types";
+import { SaveOfferButton } from "@/features/saved-offers/components/save-offer-button";
 
-export function PublicListingDetails({ initialListing }: { initialListing: MarketplaceListingDTO }) {
+export function PublicListingDetails({ initialListing, initiallySaved }: { initialListing: MarketplaceListingDTO; initiallySaved: boolean }) {
   const { data: listing, isFetching } = useQuery({
     queryKey: ["public-marketplace-listing", initialListing.listingId],
     queryFn: () => fetchMarketplaceListing(initialListing.listingId),
@@ -23,7 +24,10 @@ export function PublicListingDetails({ initialListing }: { initialListing: Marke
           <p className="mt-2 text-lg font-medium">{listing.offerTitle}</p>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{listing.offerDescription || "No additional credit card offer description."}</p>
         </div>
-        <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-primary"><BadgeCheck aria-hidden="true" className="size-4" /> Offer verified</span>
+        <div className="flex flex-wrap items-center gap-2 self-start">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-primary"><BadgeCheck aria-hidden="true" className="size-4" /> Offer verified</span>
+          <SaveOfferButton offerId={listing.offerId} initiallySaved={initiallySaved} />
+        </div>
       </div>
       <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-2xl bg-muted/70 p-4"><p className="text-xs text-muted-foreground">Min spend</p><p className="mt-2 font-semibold">{formatMoney(listing.minSpend)}</p></div>
@@ -36,7 +40,7 @@ export function PublicListingDetails({ initialListing }: { initialListing: Marke
     <section className="rounded-3xl border border-border bg-card p-5 sm:p-7">
       <div className="flex items-center gap-3">
         <span className="grid size-12 place-items-center rounded-full bg-brand-ink text-primary-foreground"><UserRound aria-hidden="true" className="size-5" /></span>
-        <div><p className="font-semibold">Anonymous seller</p>
+        <div><p className="font-semibold">Seller Rating</p>
           <p className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground"><span className="inline-flex items-center gap-1"><Star aria-hidden="true" className="size-3.5 fill-current text-[#b98224]" /> {listing.sellerRatingAverage.toFixed(1)} ({listing.sellerRatingCount})</span><span className="inline-flex items-center gap-1"><MessageCircle aria-hidden="true" className="size-3.5" /> {listing.sellerCompletedInteractionCount} interactions</span></p>
         </div>
       </div>
