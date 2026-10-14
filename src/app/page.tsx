@@ -401,7 +401,10 @@ export default function LandingPage() {
       <footer className="border-t border-border bg-card">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <Brand />
-          <p className="inline-flex items-center gap-1.5"><Check aria-hidden="true" className="size-3.5 text-primary" /> Find an offer. Compare the numbers. Connect privately.</p>
+          <div className="flex flex-col gap-2 sm:items-end">
+            <Link href="/trust-safety" className="font-semibold text-primary hover:underline">Trust & Safety</Link>
+            <p className="inline-flex items-center gap-1.5"><Check aria-hidden="true" className="size-3.5 text-primary" /> Find an offer. Compare the numbers. Connect privately.</p>
+          </div>
         </div>
       </footer>
     </div>

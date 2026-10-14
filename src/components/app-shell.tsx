@@ -34,6 +34,9 @@ export function AppShell({
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
             Public marketplace views never show card details or verification evidence.
           </p>
+          <Link href="/trust-safety" className="mt-2 inline-flex min-h-8 items-center text-xs font-semibold text-primary hover:underline">
+            Trust & Safety
+          </Link>
         </div>
       </aside>
 

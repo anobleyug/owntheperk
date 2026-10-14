@@ -1,6 +1,7 @@
 "use client";
 
-import { Flag, ShieldBan } from "lucide-react";
+import { CircleHelp, Flag, ShieldBan } from "lucide-react";
+import Link from "next/link";
 import { useActionState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -62,5 +63,6 @@ export function SafetyActions({
       </details>}
     </div>
     {blockState.message && <p role={blockState.status === "error" ? "alert" : "status"} className={blockState.status === "error" ? "mt-3 text-xs font-medium text-red-700" : "mt-3 text-xs text-muted-foreground"}>{blockState.message}</p>}
+    <Link href="/trust-safety" className="mt-3 inline-flex min-h-9 items-center gap-1.5 text-xs font-semibold text-primary hover:underline"><CircleHelp aria-hidden="true" className="size-3.5" /> How reporting and blocking work</Link>
   </section>;
 }

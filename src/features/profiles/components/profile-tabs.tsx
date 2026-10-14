@@ -1,14 +1,15 @@
-import { Bookmark, UserRound } from "lucide-react";
+import { Bookmark, History, UserRound } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
 const tabs = [
   { href: "/profile", label: "Profile", icon: UserRound },
+  { href: "/profile/history", label: "History", icon: History },
   { href: "/profile/saved", label: "Saved", icon: Bookmark },
 ] as const;
 
-export function ProfileTabs({ active }: { active: "profile" | "saved" }) {
+export function ProfileTabs({ active }: { active: "profile" | "history" | "saved" }) {
   return <nav aria-label="Profile sections" className="flex gap-2 border-b border-border">
     {tabs.map(({ href, label, icon: Icon }) => {
       const selected = active === label.toLowerCase();

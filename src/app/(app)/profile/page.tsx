@@ -7,6 +7,7 @@ import {
   Star,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/page-header";
@@ -135,6 +136,18 @@ export default async function ProfilePage() {
           </p>
         </div>
         <InstallAppButton />
+      </section>
+
+      <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div>
+          <h2 className="font-semibold">Trust & Safety Center</h2>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Review verification limits, privacy guidance, prohibited behavior, reporting, and blocking.
+          </p>
+        </div>
+        <Button asChild variant="outline" className="w-full sm:w-auto">
+          <Link href="/trust-safety"><ShieldCheck aria-hidden="true" /> View safety guide</Link>
+        </Button>
       </section>
 
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
