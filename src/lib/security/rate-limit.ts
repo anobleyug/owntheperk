@@ -17,6 +17,7 @@ export type RateLimitScope =
   | "MESSAGE_SEND"
   | "LISTING_CREATE"
   | "REPORT_CREATE"
+  | "FEEDBACK_CREATE"
   | "CHECKOUT_CREATE";
 
 type RateLimitRule = {

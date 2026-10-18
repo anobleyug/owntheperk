@@ -38,6 +38,29 @@ const moderationSchema = z.object({
   operation: z.enum(["REVIEWING", "RESOLVED", "DISMISSED", "SUSPEND_USER", "REMOVE_LISTING"]),
 });
 
+const feedbackStatusSchema = z.object({
+  submissionId: z.uuid(),
+  status: z.enum(["REVIEWED", "CLOSED"]),
+});
+
+export async function updateFeedbackStatusAction(submissionId: string, status: string) {
+  const parsed = feedbackStatusSchema.safeParse({ submissionId, status });
+  if (!parsed.success) redirect("/admin/feedback?action=error");
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || !(await canCurrentUserModerate(supabase, user.id))) redirect("/search");
+
+  const { error } = await supabase.from("feedback_submissions")
+    .update({ status: parsed.data.status })
+    .eq("id", parsed.data.submissionId)
+    .select("id")
+    .single();
+  if (error) redirect("/admin/feedback?action=error");
+
+  revalidatePath("/admin/feedback");
+  redirect("/admin/feedback?action=success");
+}
+
 export async function moderateReportAction(reportId: string, operation: string) {
   const parsed = moderationSchema.safeParse({ reportId, operation });
   if (!parsed.success) redirect("/admin/reports?action=error");

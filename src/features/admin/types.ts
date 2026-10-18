@@ -1,5 +1,6 @@
 import type { EvidenceStatus, RewardType } from "@/features/offers/types";
 import type { ReportReason, ReportStatus } from "@/features/trust/types";
+import type { FeedbackCategory, FeedbackStatus, FeedbackType } from "@/features/feedback/types";
 
 export type AppRole = "USER" | "MODERATOR" | "ADMIN";
 export type ReviewDecision = "APPROVE" | "REJECT" | "NEEDS_REVIEW";
@@ -35,6 +36,21 @@ export type AdminReportDTO = {
   reportedAccountStatus: "ACTIVE" | "SUSPENDED" | "BANNED";
   contextMerchantName: string | null;
   contextOfferTitle: string | null;
+};
+
+export type AdminFeedbackDTO = {
+  id: string;
+  userId: string;
+  username: string;
+  type: FeedbackType;
+  category: FeedbackCategory | null;
+  subject: string;
+  message: string;
+  pageUrl: string | null;
+  userAgent: string | null;
+  status: FeedbackStatus;
+  createdAt: string;
+  reviewedAt: string | null;
 };
 
 export type MerchantAnalyticsDTO = {

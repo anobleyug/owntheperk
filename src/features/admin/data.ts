@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { EvidenceStatus, RewardType } from "@/features/offers/types";
 import { adminAnalyticsSchema } from "./analytics-schema";
-import type { AdminAnalyticsDTO, AdminReportDTO, AdminVerificationDTO } from "./types";
+import type { AdminAnalyticsDTO, AdminFeedbackDTO, AdminReportDTO, AdminVerificationDTO } from "./types";
 
 type ListingRow = {
   id: string; offer_id: string; user_id: string; min_spend: number | string;
@@ -105,6 +105,53 @@ export async function getModerationReports(supabase: SupabaseClient): Promise<Ad
     reportedAccountStatus: row.reported_account_status,
     contextMerchantName: row.listing_merchant_name ?? row.conversation_merchant_name,
     contextOfferTitle: row.listing_offer_title ?? row.conversation_offer_title,
+  }));
+}
+
+type AdminFeedbackRow = {
+  id: string;
+  user_id: string;
+  type: AdminFeedbackDTO["type"];
+  category: AdminFeedbackDTO["category"];
+  subject: string;
+  message: string;
+  page_url: string | null;
+  user_agent: string | null;
+  status: AdminFeedbackDTO["status"];
+  created_at: string;
+  reviewed_at: string | null;
+};
+
+export async function getFeedbackSubmissions(supabase: SupabaseClient): Promise<AdminFeedbackDTO[]> {
+  const { data, error } = await supabase.from("feedback_submissions")
+    .select("id, user_id, type, category, subject, message, page_url, user_agent, status, created_at, reviewed_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) throw new Error("Unable to load feedback submissions.");
+  const submissions = (data ?? []) as AdminFeedbackRow[];
+  if (!submissions.length) return [];
+
+  const userIds = [...new Set(submissions.map((submission) => submission.user_id))];
+  const profileResult = await supabase.from("profiles").select("id, username").in("id", userIds);
+  if (profileResult.error) throw new Error("Unable to load feedback account references.");
+  const usernames = new Map(
+    ((profileResult.data ?? []) as { id: string; username: string | null }[])
+      .map((profile) => [profile.id, profile.username]),
+  );
+
+  return submissions.map((submission) => ({
+    id: submission.id,
+    userId: submission.user_id,
+    username: usernames.get(submission.user_id) ?? "Unknown member",
+    type: submission.type,
+    category: submission.category,
+    subject: submission.subject,
+    message: submission.message,
+    pageUrl: submission.page_url,
+    userAgent: submission.user_agent,
+    status: submission.status,
+    createdAt: submission.created_at,
+    reviewedAt: submission.reviewed_at,
   }));
 }
 

@@ -3,6 +3,8 @@ import {
   CalendarDays,
   LogOut,
   MessageCircleReply,
+  MessageSquarePlus,
+  Bug,
   ShieldCheck,
   Star,
 } from "lucide-react";
@@ -136,6 +138,21 @@ export default async function ProfilePage() {
           </p>
         </div>
         <InstallAppButton />
+      </section>
+
+      <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
+        <h2 className="font-semibold">Help & feedback</h2>
+        <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+          Report a problem or share an idea with the team. These are private, one-way submissions.
+        </p>
+        <div className="mt-4 grid gap-3 min-[420px]:grid-cols-2 sm:flex">
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <Link href="/profile/feedback?type=BUG&from=/profile"><Bug aria-hidden="true" /> Report a Bug</Link>
+          </Button>
+          <Button asChild variant="outline" className="w-full sm:w-auto">
+            <Link href="/profile/feedback?type=FEEDBACK&from=/profile"><MessageSquarePlus aria-hidden="true" /> Send Feedback</Link>
+          </Button>
+        </div>
       </section>
 
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
